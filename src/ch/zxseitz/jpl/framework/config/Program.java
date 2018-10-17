@@ -1,5 +1,11 @@
 package ch.zxseitz.jpl.framework.config;
 
+
+import org.ejml.data.FMatrix2;
+import org.ejml.data.FMatrix3;
+import org.ejml.data.FMatrix4;
+import org.ejml.data.FMatrix4x4;
+
 import static org.lwjgl.opengl.GL20.*;
 
 public class Program {
@@ -38,20 +44,26 @@ public class Program {
     glUniform1f(getLocation(name), value);
   }
 
-  public void writeVec2(String name, float[] value) {
-    glUniform2fv(getLocation(name), value);
+  public void writeVec2(String name, FMatrix2 value) {
+    glUniform2f(getLocation(name), value.a1, value.a2);
   }
 
-  public void writeVec3(String name, float[] value) {
-    glUniform3fv(getLocation(name), value);
+  public void writeVec3(String name, FMatrix3 value) {
+    glUniform3f(getLocation(name), value.a1, value.a2, value.a3);
   }
 
-  public void writeVec4(String name, float[] value) {
-    glUniform4fv(getLocation(name), value);
+  public void writeVec4(String name, FMatrix4 value) {
+    glUniform4f(getLocation(name), value.a1, value.a2, value.a3, value.a4);
   }
 
-  public void writeMat4(String name, float[] value) {
+  public void writeMat4(String name, FMatrix4x4 value) {
     //TODO: check transpose
-    glUniformMatrix4fv(getLocation(name), false, value);
+    //TODO flyweight pattern array?
+    glUniformMatrix4fv(getLocation(name), false, new float[] {
+        value.a11, value.a12, value.a13, value.a14,
+        value.a21, value.a22, value.a23, value.a24,
+        value.a31, value.a32, value.a33, value.a34,
+        value.a41, value.a42, value.a43, value.a44,
+    });
   }
 }
