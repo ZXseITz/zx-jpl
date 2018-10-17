@@ -1,4 +1,4 @@
-package ch.zxseitz.jpl.framework;
+package ch.zxseitz.jpl.framework.fx;
 
 import ch.zxseitz.jpl.framework.color.HdrColor;
 import javafx.scene.image.*;
@@ -22,7 +22,7 @@ public class GLWindow extends Pane {
     for (int i = 0; i < buffer.length; i++) {
       buffer[i] = (byte)255; // white
     }
-    WritableImage image = new WritableImage(width, height);
+    var image = new WritableImage(width, height);
     this.writer = image.getPixelWriter();
     this.getChildren().add(new ImageView(image));
   }
