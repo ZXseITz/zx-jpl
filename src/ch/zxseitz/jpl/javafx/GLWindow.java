@@ -1,6 +1,5 @@
-package ch.zxseitz.jpl.framework.fx;
+package ch.zxseitz.jpl.javafx;
 
-import ch.zxseitz.jpl.framework.color.HdrColor;
 import javafx.scene.image.*;
 import javafx.scene.layout.Pane;
 

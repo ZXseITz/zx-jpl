@@ -1,4 +1,4 @@
-package ch.zxseitz.jpl.framework.color;
+package ch.zxseitz.jpl.javafx;
 
 import javafx.scene.paint.Color;
 

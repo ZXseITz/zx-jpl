@@ -1,3 +1,5 @@
+package ch.zxseitz.jpl;
+
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;

@@ -1,7 +1,7 @@
-package ch.zxseitz.jpl;
+package ch.zxseitz.jpl.javafx;
 
-import ch.zxseitz.jpl.framework.fx.GLWindow;
-import ch.zxseitz.jpl.framework.color.HdrColor;
+import ch.zxseitz.jpl.javafx.GLWindow;
+import ch.zxseitz.jpl.javafx.HdrColor;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
