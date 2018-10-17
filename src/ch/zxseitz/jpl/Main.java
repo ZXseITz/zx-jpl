@@ -1,19 +1,18 @@
 package ch.zxseitz.jpl;
 
 import ch.zxseitz.jpl.framework.GLWindow;
+import ch.zxseitz.jpl.framework.color.HdrColor;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class Main extends Application {
   @Override
   public void start(Stage primaryStage) throws Exception {
     GLWindow window = new GLWindow(800, 450);
-    window.setPixels(50, 50, 200, 200, Color.GREEN);
+    window.setPixels(50, 50, 200, 200, HdrColor.GREEN);
     window.write();
-    Scene scene = new Scene(new Pane(window));
+    Scene scene = new Scene(window);
 
     primaryStage.setScene(scene);
     primaryStage.setTitle("GLWindow");
