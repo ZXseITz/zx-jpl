@@ -1,15 +1,17 @@
 package ch.zxseitz.jpl.framework.scene;
 
+import ch.zxseitz.jpl.framework.math.Matrix4;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class SceneObj {
     private Object mesh;
-    private Object matrix;
+    private Matrix4 matrix;
 
     private final List<SceneObj> children;
 
-    public SceneObj(Object mesh, Object matrix) {
+    public SceneObj(Object mesh, Matrix4 matrix) {
         this.children = new ArrayList<>(10);
         this.matrix = matrix;
         this.mesh = mesh;
@@ -23,11 +25,11 @@ public class SceneObj {
         this.mesh = mesh;
     }
 
-    public Object getMatrix() {
+    public Matrix4 getMatrix() {
         return matrix;
     }
 
-    public void setMatrix(Object matrix) {
+    public void setMatrix(Matrix4 matrix) {
         this.matrix = matrix;
     }
 
