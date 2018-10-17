@@ -1,5 +1,8 @@
 package ch.zxseitz.jpl.framework.config;
 
+import ch.zxseitz.jpl.framework.math.Vector2;
+import ch.zxseitz.jpl.framework.math.Vector3;
+import ch.zxseitz.jpl.framework.math.Vector4;
 import org.ejml.data.FMatrix2;
 import org.ejml.data.FMatrix3;
 import org.ejml.data.FMatrix4;
@@ -43,16 +46,16 @@ public class Program {
         glUniform1f(getLocation(name), value);
     }
 
-    public void writeVec2(String name, FMatrix2 value) {
-        glUniform2f(getLocation(name), value.a1, value.a2);
+    public void writeVec2(String name, Vector2 value) {
+        glUniform2f(getLocation(name), value.x, value.y);
     }
 
-    public void writeVec3(String name, FMatrix3 value) {
-        glUniform3f(getLocation(name), value.a1, value.a2, value.a3);
+    public void writeVec3(String name, Vector3 value) {
+        glUniform3f(getLocation(name), value.x, value.y, value.z);
     }
 
-    public void writeVec4(String name, FMatrix4 value) {
-        glUniform4f(getLocation(name), value.a1, value.a2, value.a3, value.a4);
+    public void writeVec4(String name, Vector4 value) {
+        glUniform4f(getLocation(name), value.x, value.y, value.z, value.w);
     }
 
     public void writeMat4(String name, FMatrix4x4 value) {
