@@ -10,7 +10,7 @@ public class Main extends Application {
   @Override
   public void start(Stage primaryStage) throws Exception {
     GLWindow window = new GLWindow(800, 450);
-    window.setPixels(50, 50, 200, 200, HdrColor.GREEN);
+    window.setPixels(50, 50, 200, 200, HdrColor.RED);
     window.write();
     Scene scene = new Scene(window);
 

@@ -1,10 +1,7 @@
 package ch.zxseitz.jpl.framework;
 
 import ch.zxseitz.jpl.framework.color.HdrColor;
-import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelFormat;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
+import javafx.scene.image.*;
 import javafx.scene.layout.Pane;
 
 import java.nio.ByteBuffer;
@@ -23,7 +20,7 @@ public class GLWindow extends Pane {
     this.stride = width * 4;
     this.buffer = new byte[width * height * 4];
     for (int i = 0; i < buffer.length; i++) {
-      buffer[i] = 1; // white
+      buffer[i] = (byte)255; // white
     }
     WritableImage image = new WritableImage(width, height);
     this.writer = image.getPixelWriter();
