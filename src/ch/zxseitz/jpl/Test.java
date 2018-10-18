@@ -16,6 +16,7 @@ public class Test extends Application {
     var p = new Program("simpleVertex", "simpleFragment");
     var mesh = new Mesh(p);
 //    mesh.addAll();
+    scene.getCamera().setProjection(Matrix4.createOrthogonalProjection(-2f, 2f, (float) width/height, 1f, 100f));
     scene.getNodes().add(new SceneObj(mesh, Matrix4.createTranslation(0,0,-5f)));
   }
 

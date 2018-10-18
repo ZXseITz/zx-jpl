@@ -192,21 +192,38 @@ public class Matrix4 {
     );
   }
 
-  public static Matrix4 createOrthogonalProjection(float left, float right, float top, float bottom, float near, float far) {
+  /**
+   *
+   * @param left
+   * @param right
+   * @param aspect width/height
+   * @param near
+   * @param far
+   * @return
+   */
+  public static Matrix4 createOrthogonalProjection(float left, float right, float aspect, float near, float far) {
+    var dasp = 1f / aspect;
+    var bottom = left * dasp;
+    var top = right * dasp;
+    var rl = 1f / (right - left);
+    var tb = 1f / (top - bottom);
+    var fn = 1f / (far - near);
     return new Matrix4(
-        0f, 0f, 0f, 0f,
-        0f, 0f, 0f, 0f,
-        0f, 0f, 0f, 0f,
+        2f * rl, 0f, 0f, - (right + left) * rl,
+        0f, 2f * tb, 0f, - (top + bottom) * tb,
+        0f, 0f, -2f * fn, -(far + near) * fn,
         0f, 0f, 0f, 1f
     );
   }
 
-  public static Matrix4 createCentralProjection(float left, float right, float top, float bottom, float near, float far) {
-    return new Matrix4(
-        0f, 0f, 0f, 0f,
-        0f, 0f, 0f, 0f,
-        0f, 0f, 0f, 0f,
-        0f, 0f, 0f, 1f
-    );
+  public static Matrix4 createPerspectiveFieldOfView(float fov, float aspect, float near, float far) {
+    //TODO: Implement
+//    return new Matrix4(
+//        0f, 0f, 0f, 0f,
+//        0f, 0f, 0f, 0f,
+//        0f, 0f, 0f, 0f,
+//        0f, 0f, 0f, 1f
+//    );
+    return null;
   }
 }

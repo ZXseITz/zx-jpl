@@ -16,6 +16,10 @@ public class SceneGraph {
         this.camera = new Camera();
     }
 
+    public Camera getCamera() {
+        return camera;
+    }
+
     public List<SceneObj> getNodes() {
         return nodes;
     }
