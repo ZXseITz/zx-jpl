@@ -2,7 +2,7 @@ package ch.zxseitz.jpl.framework.config;
 
 import ch.zxseitz.jpl.framework.IOHandler;
 
-import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL45.*;
 
 public class Shader {
     public enum ShaderType {
@@ -13,6 +13,8 @@ public class Shader {
     public final String name;
     public final int id;
     public final ShaderType type;
+
+    //TODO: parse shader variables
 
     Shader(String name, ShaderType type) {
         this.name = name;

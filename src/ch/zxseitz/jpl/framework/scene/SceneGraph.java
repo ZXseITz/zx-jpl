@@ -9,33 +9,29 @@ import java.util.List;
 public class SceneGraph {
     private final List<SceneObj> nodes;
 
-    private Matrix4 projection;
-    private Matrix4 camera;
-    private Program p;
+    private Camera camera;
 
     public SceneGraph() {
         this.nodes = new ArrayList<>(25);
-        this.projection = Matrix4.ID;
-        this.camera = Matrix4.ID;
+        this.camera = new Camera();
     }
 
     public List<SceneObj> getNodes() {
         return nodes;
     }
 
-    public void render(Program p) {
-        this.p = p;
+    public void render() {
         for (SceneObj node: nodes) {
-            render(camera, node);
+            render(camera.getMatrix(), node);
         }
     }
 
     private void render(Matrix4 transform, SceneObj node) {
-        var t = new Matrix4(transform);
-        t.multiply(node.getMatrix());
-
+        var t = Matrix4.multiply(transform, node.getMatrix());
         var mesh = node.getMesh();
         if (mesh != null) {
+            Program p = mesh.getProgram();
+            p.writeMat4("P", camera.getProjection());
             p.writeMat4("T", t);
             mesh.render();
         }

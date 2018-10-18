@@ -26,6 +26,10 @@ public class Matrix4 {
     };
   }
 
+  public Matrix4() {
+    this.data = new float[SIZE];
+  }
+
   public Matrix4(float[] data) {
     if (data.length != SIZE) throw new RuntimeException("Invalid Matrix size");
     this.data = data;
@@ -47,24 +51,6 @@ public class Matrix4 {
     }
   }
 
-  public void multiplyElements(Matrix4 mat) {
-    for (int i = 0; i < SIZE; i++) {
-      data[i] *= mat.data[i];
-    }
-  }
-
-  public void multiplyLeft(Matrix4 mat) {
-    for (int i = 0; i < SIZE; i++) {
-      float value = 0;
-      int r = i / 4;
-      int c = i % 4;
-      for (int x = 0; x < 4; x++) {
-        value += mat.data[r * 4 + x] * data[c + x * 4];
-      }
-      data[i] = value;
-    }
-  }
-
   public void multiply(Matrix4 mat) {
     for (int i = 0; i < SIZE; i++) {
       float value = 0;
@@ -75,5 +61,152 @@ public class Matrix4 {
       }
       data[i] = value;
     }
+  }
+
+  public void multiplyElements(Matrix4 mat) {
+    for (int i = 0; i < SIZE; i++) {
+      data[i] *= mat.data[i];
+    }
+  }
+
+
+  public static Matrix4 add(Matrix4 a, Matrix4 b) {
+    var r = new Matrix4();
+    for (int i = 0; i < SIZE; i++) {
+      r.data[i] = a.data[i] + b.data[i];
+    }
+    return r;
+  }
+
+  public static Matrix4 subtract(Matrix4 a, Matrix4 b) {
+    var r = new Matrix4();
+    for (int i = 0; i < SIZE; i++) {
+      r.data[i] = a.data[i] - b.data[i];
+    }
+    return r;
+  }
+
+  public static Matrix4 multiply(Matrix4 a, Matrix4 b) {
+    var r = new Matrix4();
+    for (int i = 0; i < SIZE; i++) {
+      float value = 0;
+      int row = i / 4;
+      int col = i % 4;
+      for (int x = 0; x < 4; x++) {
+        value += a.data[row * 4 + x] * b.data[col + x * 4];
+      }
+      r.data[i] = value;
+    }
+    return r;
+  }
+
+  public static Matrix4 multiplyElements(Matrix4 a, Matrix4 b) {
+    var r = new Matrix4();
+    for (int i = 0; i < SIZE; i++) {
+      r.data[i] = a.data[i] * b.data[i];
+    }
+    return r;
+  }
+
+  public static Matrix4 createTranslation(float x, float y, float z) {
+    return new Matrix4(
+        1f, 0f, 0f, x,
+        0f, 1f, 0f, y,
+        0f, 0f, 1f, z,
+        0f, 0f, 0f, 1f
+    );
+  }
+
+  public static Matrix4 createTranslation(Vector3 vec) {
+    return new Matrix4(
+        1f, 0f, 0f, vec.x,
+        0f, 1f, 0f, vec.y,
+        0f, 0f, 1f, vec.z,
+        0f, 0f, 0f, 1f
+    );
+  }
+
+  public static Matrix4 createRotation(Vector3 axis, float phi) {
+    var sin = (float) Math.sin(phi);
+    var cos = (float) Math.cos(phi);
+    var cos1 = (1 - cos);
+    var ax = axis.x;
+    var ay = axis.y;
+    var az = axis.z;
+    return new Matrix4(
+        cos1 * ax * ax + cos, cos1 * ax * ay - sin * az, cos1 * ax * az + sin * ay, 0f,
+        cos1 * ay * ax + sin * az, cos1 * ay * ay + cos, cos1 * ay * az - sin * ax, 0f,
+        cos1 * az * ax - sin * ay, cos1 * az * ay + sin * ax, cos1 * az * az + cos, 0f,
+        0f, 0f, 0f, 1f
+    );
+  }
+
+  public static Matrix4 createRotationX(float phi) {
+    var sin = (float) Math.sin(phi);
+    var cos = (float) Math.cos(phi);
+    return new Matrix4(
+        1f, 0f, 0f, 0f,
+        0f, cos, -sin, 0f,
+        0f, sin, cos, 0f,
+        0f, 0f, 0f, 1f
+    );
+  }
+
+  public static Matrix4 createRotationY(float phi) {
+    var sin = (float) Math.sin(phi);
+    var cos = (float) Math.cos(phi);
+    return new Matrix4(
+        cos, 0f, sin, 0f,
+        0f, 1f, 0f, 0f,
+        -sin, 0f, cos, 0f,
+        0f, 0f, 0f, 1f
+    );
+  }
+
+  public static Matrix4 createRotationZ(float phi) {
+    var sin = (float) Math.sin(phi);
+    var cos = (float) Math.cos(phi);
+    return new Matrix4(
+        cos, -sin, 0f, 0f,
+        sin, cos, 0f, 0f,
+        0f, 0f, 1f, 0f,
+        0f, 0f, 0f, 1f
+    );
+  }
+
+  public static Matrix4 createScale(float sx, float sy, float sz) {
+    return new Matrix4(
+        sx, 0f, 0f, 0f,
+        0f, sy, 0f, 0f,
+        0f, 0f, sz, 0f,
+        0f, 0f, 0f, 1f
+    );
+  }
+
+  public static Matrix4 createScale(Vector3 s) {
+    return new Matrix4(
+        s.x, 0f, 0f, 0f,
+        0f, s.y, 0f, 0f,
+        0f, 0f, s.z, 0f,
+        0f, 0f, 0f, 1f
+    );
+  }
+
+  public static Matrix4 createOrthogonalProjection(float left, float right, float top, float bottom, float near, float far) {
+    return new Matrix4(
+        0f, 0f, 0f, 0f,
+        0f, 0f, 0f, 0f,
+        0f, 0f, 0f, 0f,
+        0f, 0f, 0f, 1f
+    );
+  }
+
+  public static Matrix4 createCentralProjection(float left, float right, float top, float bottom, float near, float far) {
+    return new Matrix4(
+        0f, 0f, 0f, 0f,
+        0f, 0f, 0f, 0f,
+        0f, 0f, 0f, 0f,
+        0f, 0f, 0f, 1f
+    );
   }
 }

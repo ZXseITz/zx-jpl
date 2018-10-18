@@ -5,7 +5,7 @@ import ch.zxseitz.jpl.framework.math.Vector2;
 import ch.zxseitz.jpl.framework.math.Vector3;
 import ch.zxseitz.jpl.framework.math.Vector4;
 
-import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL45.*;
 
 public class Program {
     public final int id;
@@ -35,7 +35,7 @@ public class Program {
         glUseProgram(this.id);
     }
 
-    private int getLocation(String name) {
+    public int getLocation(String name) {
         return glGetUniformLocation(this.id, name);
     }
 

@@ -1,27 +1,35 @@
-package ch.zxseitz.jpl;
+package ch.zxseitz.jpl.framework;
 
-import org.lwjgl.*;
-import org.lwjgl.glfw.*;
-import org.lwjgl.opengl.*;
-import org.lwjgl.system.*;
+import ch.zxseitz.jpl.framework.scene.SceneGraph;
+import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.system.MemoryStack;
 
-import java.nio.*;
+import java.nio.IntBuffer;
 
-import static org.lwjgl.glfw.Callbacks.*;
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.system.MemoryStack.*;
-import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.system.MemoryStack.stackPush;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
-public class HelloWorld {
-
-  // The window handle
+public abstract class Application {
+  protected final int width, height;
+  private final String title;
+  protected final SceneGraph scene;
   private long window;
 
-  public void run() {
-    System.out.println("Hello LWJGL " + Version.getVersion() + "!");
 
-    init();
+  public Application(int width, int height, String title) {
+    this.width = width;
+    this.height = height;
+    this.title = title;
+    this.scene = new SceneGraph();
+  }
+
+  public final void run() {
+    setUp();
     loop();
 
     // Free the window callbacks and destroy the window
@@ -33,7 +41,7 @@ public class HelloWorld {
     glfwSetErrorCallback(null).free();
   }
 
-  private void init() {
+  private void setUp() {
     // Setup an error callback. The default implementation
     // will print the error message in System.err.
     GLFWErrorCallback.createPrint(System.err).set();
@@ -48,7 +56,7 @@ public class HelloWorld {
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
     // Create the window
-    window = glfwCreateWindow(300, 300, "Hello World!", NULL, NULL);
+    window = glfwCreateWindow(width, height, title, NULL, NULL);
     if ( window == NULL )
       throw new RuntimeException("Failed to create the GLFW window");
 
@@ -93,25 +101,19 @@ public class HelloWorld {
     // creates the GLCapabilities instance and makes the OpenGL
     // bindings available for use.
     GL.createCapabilities();
+    glClearColor(0.8f, 0.8f, 0.8f, 0.0f);
+    init();
 
-    // Set the clear color
-    glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
-
-    // Run the rendering loop until the user has attempted to close
-    // the window or has pressed the ESCAPE key.
-    while ( !glfwWindowShouldClose(window) ) {
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-
-      glfwSwapBuffers(window); // swap the color buffers
-
-      // Poll for window events. The key callback above will only be
-      // invoked during this call.
+    while (!glfwWindowShouldClose(window)) {
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      updateFrame();
+      scene.render();
+      glfwSwapBuffers(window);
+      // Poll for window events. The key callback above will only be invoked during this call.
       glfwPollEvents();
     }
   }
 
-  public static void main(String[] args) {
-    new HelloWorld().run();
-  }
-
+  protected abstract void init();
+  protected abstract void updateFrame();
 }
