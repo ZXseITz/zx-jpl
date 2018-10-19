@@ -3,6 +3,7 @@ package ch.zxseitz.jpl.framework.mesh;
 import ch.zxseitz.jpl.framework.config.Program;
 import javafx.util.Pair;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL45.*;
@@ -30,6 +31,7 @@ public class Mesh {
   public Mesh(Program program) {
     this.program = program;
     this.vao = glCreateVertexArrays();
+    this.vbos = new HashMap<>(5);
   }
 
   public Program getProgram() {

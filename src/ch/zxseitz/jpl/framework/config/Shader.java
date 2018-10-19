@@ -1,35 +1,63 @@
 package ch.zxseitz.jpl.framework.config;
 
-import ch.zxseitz.jpl.framework.IOHandler;
+import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.lwjgl.opengl.GL45.*;
 
 public class Shader {
+    private static final Charset utf8 = Charset.forName("UTF-8");
+
     public enum ShaderType {
-        VERTEX_SHADER,
-        FRAGMENT_SHADER
+        VERTEX_SHADER(GL_VERTEX_SHADER),
+        FRAGMENT_SHADER(GL_FRAGMENT_SHADER);
+
+        public final int code;
+        ShaderType(int code) {this.code = code;}
     }
 
-    public final String name;
     public final int id;
-    public final ShaderType type;
+    private final String path;
+    private final ShaderType type;
 
     //TODO: parse shader variables
 
-    Shader(String name, ShaderType type) {
-        this.name = name;
+    Shader(String path, ShaderType type) {
+        this.path = path;
         this.type = type;
 
-        var source = IOHandler.readFile(String.format("shaders/%s.glsl", name), IOHandler.utf8);
-        var id = glCreateShader(type == ShaderType.VERTEX_SHADER ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
+        var source = loadShader(path, utf8);
+        var id = glCreateShader(type.code);
         glShaderSource(id, source);
         glCompileShader(id);
 
         if (glGetShaderi(id, GL_COMPILE_STATUS) == GL_FALSE) {
-            throw new RuntimeException(String.format("Error creating shader %s\n%s", name,
+            throw new RuntimeException(String.format("Error creating shader %s\n%s", this.path,
                     glGetShaderInfoLog(id, glGetShaderi(id, GL_INFO_LOG_LENGTH))));
         }
 
         this.id = id;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public ShaderType getType() {
+        return type;
+    }
+
+    private String loadShader(String path, Charset encoding) {
+        try {
+            var file = new File(path);
+            var encoded = Files.readAllBytes(file.toPath());
+            return new String(encoded, encoding);
+        } catch (Exception e) {
+            System.err.println(String.format("Error reading shader %s", path));
+            e.printStackTrace();
+        }
+        return null;
     }
 }
