@@ -21,7 +21,7 @@ public class SceneGraph {
     public SceneGraph() {
         this.nodes = new ArrayList<>(25);
         this.camera = new Camera();
-        this.lightPos = new Vector3(0f, 0f, 1f);
+        this.lightPos = new Vector3(0f, 0f, 5f);
         this.ambient = new Color(0.1, 0.1, 0.1, 1.);
     }
 
@@ -75,7 +75,7 @@ public class SceneGraph {
             p.writeMat4("T", t);
             mesh.render();
         }
-        for (SceneObj node1: nodes) {
+        for (SceneObj node1: node.getChildren()) {
             render(t, node1);
         }
     }

@@ -30,7 +30,8 @@ public class Mesh {
 
   public Mesh(Program program) {
     this.program = program;
-    this.vao = glCreateVertexArrays();
+    this.vao = glGenVertexArrays();
+    glBindVertexArray(this.vao);
     this.vbos = new HashMap<>(5);
   }
 
@@ -68,9 +69,10 @@ public class Mesh {
     var id = glGenBuffers();
     glBindBuffer(GL_ARRAY_BUFFER, id);
     glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(program.getLocation(name));
+    var location = program.getAttribLocation(name);
+    glEnableVertexAttribArray(location);
     glBindBuffer(GL_ARRAY_BUFFER, id);
-    glVertexAttribPointer(program.getLocation(name), size, GL_FLOAT, false, 0, 0);
+    glVertexAttribPointer(location, size, GL_FLOAT, false, 0, 0);
     return id;
   }
 
@@ -84,7 +86,7 @@ public class Mesh {
 
   public void render() {
     glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vboIdx);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIdx);
     glDrawElements(mode.type, idxLength, GL_UNSIGNED_INT, 0);
   }
 }

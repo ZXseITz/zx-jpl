@@ -101,7 +101,10 @@ public abstract class Application {
     // creates the GLCapabilities instance and makes the OpenGL
     // bindings available for use.
     GL.createCapabilities();
-    glClearColor(0.8f, 0.8f, 0.8f, 0.0f);
+    glClearDepth(1.);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glDisable(GL_CULL_FACE);
     init();
 
     while (!glfwWindowShouldClose(window)) {

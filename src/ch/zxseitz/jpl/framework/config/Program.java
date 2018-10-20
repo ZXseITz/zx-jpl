@@ -6,8 +6,6 @@ import ch.zxseitz.jpl.framework.math.Vector3;
 import ch.zxseitz.jpl.framework.math.Vector4;
 import javafx.scene.paint.Color;
 
-import java.io.File;
-
 import static org.lwjgl.opengl.GL45.*;
 
 public class Program {
@@ -40,52 +38,56 @@ public class Program {
     glUseProgram(this.id);
   }
 
-  public int getLocation(String name) {
+  public int getUniformLocation(String name) {
     return glGetUniformLocation(this.id, name);
   }
 
+  public int getAttribLocation(String name) {
+    return glGetAttribLocation(this.id, name);
+  }
+
   public void writeBool(String name, boolean value) {
-    glUniform1i(getLocation(name), value ? 1 : 0);
+    glUniform1i(getUniformLocation(name), value ? 1 : 0);
   }
 
   public void writeInt(String name, int value) {
-    glUniform1i(getLocation(name), value);
+    glUniform1i(getUniformLocation(name), value);
   }
 
   public void writeFloat(String name, float value) {
-    glUniform1f(getLocation(name), value);
+    glUniform1f(getUniformLocation(name), value);
   }
 
   public void writeVec2(String name, Vector2 value) {
-    glUniform2f(getLocation(name), value.x, value.y);
+    glUniform2f(getUniformLocation(name), value.x, value.y);
   }
 
   public void writeVec2(String name, float x, float y) {
-    glUniform2f(getLocation(name), x, y);
+    glUniform2f(getUniformLocation(name), x, y);
   }
 
   public void writeVec3(String name, float x, float y, float z) {
-    glUniform3f(getLocation(name), x, y, z);
+    glUniform3f(getUniformLocation(name), x, y, z);
   }
 
   public void writeVec3(String name, Vector3 value) {
-    glUniform3f(getLocation(name), value.x, value.y, value.z);
+    glUniform3f(getUniformLocation(name), value.x, value.y, value.z);
   }
 
   public void writeVec4(String name, float x, float y, float z, float w) {
-    glUniform4f(getLocation(name), x, y, z, w);
+    glUniform4f(getUniformLocation(name), x, y, z, w);
   }
 
   public void writeVec4(String name, Vector4 value) {
-    glUniform4f(getLocation(name), value.x, value.y, value.z, value.w);
+    glUniform4f(getUniformLocation(name), value.x, value.y, value.z, value.w);
   }
 
   public void writeVec4(String name, Color color) {
-    glUniform4f(getLocation(name), (float) color.getRed(), (float) color.getGreen(), (float) color.getBlue(), (float) color.getOpacity());
+    glUniform4f(getUniformLocation(name), (float) color.getRed(), (float) color.getGreen(), (float) color.getBlue(), (float) color.getOpacity());
   }
 
   public void writeMat4(String name, Matrix4 mat) {
     //TODO: check transpose
-    glUniformMatrix4fv(getLocation(name), false, mat.data);
+    glUniformMatrix4fv(getUniformLocation(name), false, mat.data);
   }
 }
