@@ -1,9 +1,9 @@
-package ch.zxseitz.jpl.framework.scene;
+package ch.zxseitz.jpl.graphics.scene;
 
-import ch.zxseitz.jpl.framework.config.Program;
-import ch.zxseitz.jpl.framework.math.Matrix4;
-import ch.zxseitz.jpl.framework.math.Vector3;
-import ch.zxseitz.jpl.framework.mesh.MeshTex;
+import ch.zxseitz.jpl.graphics.Program;
+import ch.zxseitz.jpl.math.Matrix4;
+import ch.zxseitz.jpl.math.Vector3;
+import ch.zxseitz.jpl.graphics.mesh.MeshTex;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class SceneGraph {
     public SceneGraph() {
         this.nodes = new ArrayList<>(25);
         this.camera = new Camera();
-        this.lightPos = new Vector3(0f, 0f, 5f);
+        this.lightPos = new Vector3(5f, 10f, 20f);
         this.ambient = new Color(0.1, 0.1, 0.1, 1.);
     }
 
@@ -51,7 +51,9 @@ public class SceneGraph {
     }
 
     public void render() {
-        for (SceneObj node: nodes) {
+        Color bg = camera.getBackground();
+        glClearColor((float) bg.getRed(), (float) bg.getGreen(), (float) bg.getBlue(), 0f);
+        for (SceneObj node : nodes) {
             render(camera.getMatrix(), node);
         }
     }
@@ -61,23 +63,17 @@ public class SceneGraph {
         var mesh = node.getMesh();
         if (mesh != null) {
             Program p = mesh.getProgram();
-            if (programId != p.id) {
-                p.use();
-                Color bg = camera.getBackground();
-                glClearColor((float) bg.getRed(), (float) bg.getGreen(), (float) bg.getBlue(), 1f);
-                p.writeMat4("P", camera.getProjection());
-                p.writeVec4("ambient", ambient);
-                p.writeVec3("l_pos", lightPos);
-
-                programId = p.id;
-            }
+            p.use();
+            p.writeMat4("P", camera.getProjection());
+            p.writeVec4("ambient", ambient);
+            p.writeVec3("l_pos", lightPos);
+            p.writeMat4("T", t);
             if (mesh instanceof MeshTex) {
                 p.writeTexture("tex", ((MeshTex) mesh).getTexture());
             }
-            p.writeMat4("T", t);
             mesh.render();
         }
-        for (SceneObj node1: node.getChildren()) {
+        for (SceneObj node1 : node.getChildren()) {
             render(t, node1);
         }
     }

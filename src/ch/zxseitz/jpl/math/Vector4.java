@@ -1,4 +1,4 @@
-package ch.zxseitz.jpl.framework.math;
+package ch.zxseitz.jpl.math;
 
 public class Vector4 {
     public static final Vector4 ZERO = new Vector4(0f, 0f, 0f, 0f);

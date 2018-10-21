@@ -1,7 +1,7 @@
-package ch.zxseitz.jpl.framework.mesh;
+package ch.zxseitz.jpl.graphics.mesh;
 
-import ch.zxseitz.jpl.framework.config.Program;
-import ch.zxseitz.jpl.framework.config.Shader;
+import ch.zxseitz.jpl.graphics.Program;
+import ch.zxseitz.jpl.graphics.Shader;
 
 public class Mesh extends AbstractMesh {
     public Mesh(Program p) {

@@ -1,6 +1,6 @@
-package ch.zxseitz.jpl.framework.scene;
+package ch.zxseitz.jpl.graphics.scene;
 
-import ch.zxseitz.jpl.framework.math.Matrix4;
+import ch.zxseitz.jpl.math.Matrix4;
 import javafx.scene.paint.Color;
 
 public class Camera {
@@ -9,7 +9,7 @@ public class Camera {
   private Color background; //x red, y green, z blue
 
   public Camera() {
-    this(Matrix4.createOrthogonalProjection(-1f, 1f, 16f/9f, -1f, 100f), Matrix4.ID, Color.LIGHTGREY);
+    this(Matrix4.createOrthogonalProjection(-1f, 1f, -1f, 1f, -1f, 100f), Matrix4.ID, Color.LIGHTGREY);
   }
 
   public Camera(Matrix4 projection, Matrix4 matrix, Color background) {
