@@ -39,11 +39,15 @@ public class Program {
   }
 
   public int getUniformLocation(String name) {
-    return glGetUniformLocation(this.id, name);
+    var location = glGetUniformLocation(this.id, name);
+    if (location < 0) throw new RuntimeException(String.format("Uniform %s has no location in program %d", name, id));
+    return location;
   }
 
   public int getAttribLocation(String name) {
-    return glGetAttribLocation(this.id, name);
+    var location = glGetAttribLocation(this.id, name);
+    if (location < 0) throw new RuntimeException(String.format("Attribute %s has no location in program %d", name, id));
+    return location;
   }
 
   public void writeBool(String name, boolean value) {
@@ -52,6 +56,9 @@ public class Program {
 
   public void writeInt(String name, int value) {
     glUniform1i(getUniformLocation(name), value);
+  }
+  public void writeTexture(String name, Texture tex) {
+    glUniform1i(getUniformLocation(name), tex.id);
   }
 
   public void writeFloat(String name, float value) {

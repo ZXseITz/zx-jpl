@@ -1,9 +1,10 @@
 package ch.zxseitz.jpl.framework.config;
 
+import javafx.util.Pair;
+
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import static org.lwjgl.opengl.GL45.*;
 
@@ -17,6 +18,14 @@ public class Shader {
         public final int code;
         ShaderType(int code) {this.code = code;}
     }
+
+    @SuppressWarnings("unchecked")
+    public static final Pair<String, Integer>[] shaderAttributes = new Pair[] {
+            new Pair("pos", 3),
+            new Pair("normal", 3),
+            new Pair("color", 4),
+            new Pair("uv", 2)
+    };
 
     public final int id;
     private final String path;
