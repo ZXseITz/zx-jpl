@@ -30,7 +30,7 @@ public abstract class Application {
 
   public final void run() {
     setUp();
-    loop();
+    start();
 
     // Free the window callbacks and destroy the window
     glfwFreeCallbacks(window);
@@ -63,7 +63,7 @@ public abstract class Application {
     // Setup a key callback. It will be called every time a key is pressed, repeated or released.
     glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
       if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
-        glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
+        glfwSetWindowShouldClose(window, true); // We will detect this in the rendering start
     });
 
     // Get the thread stack and push a new frame
@@ -94,7 +94,7 @@ public abstract class Application {
     glfwShowWindow(window);
   }
 
-  private void loop() {
+  private void start() {
     // This line is critical for LWJGL's interoperation with GLFW's
     // OpenGL context, or any context that is managed externally.
     // LWJGL detects the context that is current in the current thread,
@@ -104,12 +104,12 @@ public abstract class Application {
     glClearDepth(1.);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-    glDisable(GL_CULL_FACE);
+//    glDisable(GL_CULL_FACE);
     init();
 
     while (!glfwWindowShouldClose(window)) {
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       updateFrame();
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       scene.render();
       glfwSwapBuffers(window);
       // Poll for window events. The key callback above will only be invoked during this call.

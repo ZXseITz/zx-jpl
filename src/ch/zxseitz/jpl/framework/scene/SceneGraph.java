@@ -22,7 +22,7 @@ public class SceneGraph {
     public SceneGraph() {
         this.nodes = new ArrayList<>(25);
         this.camera = new Camera();
-        this.lightPos = new Vector3(0f, 0f, 5f);
+        this.lightPos = new Vector3(5f, 10f, 20f);
         this.ambient = new Color(0.1, 0.1, 0.1, 1.);
     }
 
@@ -51,6 +51,8 @@ public class SceneGraph {
     }
 
     public void render() {
+        Color bg = camera.getBackground();
+        glClearColor((float) bg.getRed(), (float) bg.getGreen(), (float) bg.getBlue(), 0f);
         for (SceneObj node: nodes) {
             render(camera.getMatrix(), node);
         }
@@ -63,8 +65,6 @@ public class SceneGraph {
             Program p = mesh.getProgram();
             if (programId != p.id) {
                 p.use();
-                Color bg = camera.getBackground();
-                glClearColor((float) bg.getRed(), (float) bg.getGreen(), (float) bg.getBlue(), 1f);
                 p.writeMat4("P", camera.getProjection());
                 p.writeVec4("ambient", ambient);
                 p.writeVec3("l_pos", lightPos);

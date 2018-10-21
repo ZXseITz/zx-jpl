@@ -5,8 +5,11 @@ import ch.zxseitz.jpl.framework.config.Program;
 import ch.zxseitz.jpl.framework.config.Texture;
 import ch.zxseitz.jpl.framework.math.Matrix4;
 import ch.zxseitz.jpl.framework.mesh.AbstractMesh;
+import ch.zxseitz.jpl.framework.mesh.MeshFactory;
+import ch.zxseitz.jpl.framework.mesh.MeshFactory2D;
 import ch.zxseitz.jpl.framework.mesh.MeshTex;
 import ch.zxseitz.jpl.framework.scene.SceneObj;
+import javafx.scene.paint.Color;
 import javafx.util.Pair;
 
 public class SimpleTexture extends Application {
@@ -16,32 +19,10 @@ public class SimpleTexture extends Application {
 
     @Override
     protected void init() {
-        var p = new Program("res/shaders/vertexShaderTex.glsl", "res/shaders/fragmentShaderTex.glsl");
-        var mesh = new MeshTex(p, Texture.createTexture("freebies.jpg"));
-        mesh.addAll(new float[][]{{
-                -1f, -1f, 0f,
-                1f, -1f, 0f,
-                1f, 1f, 0f,
-                -1f, 1f, 0f
-        }, {
-                0f, 0f, 1f,
-                0f, 0f, 1f,
-                0f, 0f, 1f,
-                0f, 0f, 1f
-        }, {
-                1f, 1f, 1f, 1f,
-                1f, 1f, 1f, 1f,
-                1f, 1f, 1f, 1f,
-                1f, 1f, 1f, 1f,
-        }, {
-                0f, 0f,
-                1f, 0f,
-                1f, 1f,
-                0f, 1f
-        }}, new int[]{
-                0, 1, 2, 3
-        }, AbstractMesh.PrimitiveType.TRIANGLE_FAN);
-        scene.getCamera().setProjection(Matrix4.createOrthogonalProjection(-2f, 2f, (float) width / height, 1f, 100f));
+        var pt = Program.createTexProgram();
+        var meshFactoryTex = new MeshFactory2D(pt);
+        var mesh = meshFactoryTex.createRectTex(1f, 1f, Color.WHITE,
+                Texture.createTexture("freebies.jpg"));
         scene.getNodes().add(new SceneObj(mesh, Matrix4.createTranslation(0, 0, -5f)));
     }
 

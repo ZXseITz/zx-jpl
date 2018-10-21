@@ -9,6 +9,7 @@ public class MeshTex extends AbstractMesh {
 
     public MeshTex(Program p, Texture tex) {
         super(p);
+        if (tex == null) throw new RuntimeException("Texture cannot be null"); //TODO use annotation
         this.tex = tex;
         //TODO check shader attributes
     }
