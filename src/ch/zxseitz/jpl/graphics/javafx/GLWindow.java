@@ -1,4 +1,4 @@
-package ch.zxseitz.jpl.javafx;
+package ch.zxseitz.jpl.graphics.javafx;
 
 import javafx.scene.image.*;
 import javafx.scene.layout.Pane;
