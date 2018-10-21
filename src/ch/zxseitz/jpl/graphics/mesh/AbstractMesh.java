@@ -1,7 +1,6 @@
-package ch.zxseitz.jpl.framework.mesh;
+package ch.zxseitz.jpl.graphics.mesh;
 
-import ch.zxseitz.jpl.framework.config.Program;
-import javafx.util.Pair;
+import ch.zxseitz.jpl.graphics.Program;
 
 import java.util.HashMap;
 import java.util.Map;

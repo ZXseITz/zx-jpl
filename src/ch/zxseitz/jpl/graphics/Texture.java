@@ -1,4 +1,4 @@
-package ch.zxseitz.jpl.framework.config;
+package ch.zxseitz.jpl.graphics;
 
 import org.lwjgl.BufferUtils;
 

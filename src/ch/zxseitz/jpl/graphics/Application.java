@@ -1,6 +1,6 @@
-package ch.zxseitz.jpl.framework;
+package ch.zxseitz.jpl.graphics;
 
-import ch.zxseitz.jpl.framework.scene.SceneGraph;
+import ch.zxseitz.jpl.graphics.scene.SceneGraph;
 import ch.zxseitz.jpl.utils.Tuple;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;

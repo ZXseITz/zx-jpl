@@ -1,4 +1,4 @@
-package ch.zxseitz.jpl.framework.math;
+package ch.zxseitz.jpl.math;
 
 import java.util.Arrays;
 

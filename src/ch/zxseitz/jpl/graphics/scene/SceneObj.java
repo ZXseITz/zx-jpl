@@ -1,7 +1,7 @@
-package ch.zxseitz.jpl.framework.scene;
+package ch.zxseitz.jpl.graphics.scene;
 
-import ch.zxseitz.jpl.framework.math.Matrix4;
-import ch.zxseitz.jpl.framework.mesh.AbstractMesh;
+import ch.zxseitz.jpl.math.Matrix4;
+import ch.zxseitz.jpl.graphics.mesh.AbstractMesh;
 
 import java.util.ArrayList;
 import java.util.List;

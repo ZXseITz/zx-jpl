@@ -1,17 +1,13 @@
 package ch.zxseitz.jpl;
 
-import ch.zxseitz.jpl.framework.Application;
-import ch.zxseitz.jpl.framework.config.Program;
-import ch.zxseitz.jpl.framework.config.Texture;
-import ch.zxseitz.jpl.framework.math.Matrix4;
-import ch.zxseitz.jpl.framework.mesh.AbstractMesh;
-import ch.zxseitz.jpl.framework.mesh.MeshFactory;
-import ch.zxseitz.jpl.framework.mesh.MeshFactory2D;
-import ch.zxseitz.jpl.framework.mesh.MeshTex;
-import ch.zxseitz.jpl.framework.scene.SceneObj;
-import ch.zxseitz.jpl.utils.Resizing;
+import ch.zxseitz.jpl.graphics.Application;
+import ch.zxseitz.jpl.graphics.Program;
+import ch.zxseitz.jpl.graphics.Texture;
+import ch.zxseitz.jpl.math.Matrix4;
+import ch.zxseitz.jpl.graphics.mesh.MeshFactory2D;
+import ch.zxseitz.jpl.graphics.scene.SceneObj;
+import ch.zxseitz.jpl.graphics.GraphicUtils;
 import javafx.scene.paint.Color;
-import javafx.util.Pair;
 
 public class SimpleTexture extends Application {
     public SimpleTexture() {
@@ -21,7 +17,7 @@ public class SimpleTexture extends Application {
     @Override
     protected void init() {
         //resizing
-        size.addListener(Resizing.createResizeListenerStdOrtho(scene.getCamera()));
+        size.addListener(GraphicUtils.createResizeListenerStdOrtho(scene.getCamera()));
 
         //scene
         var pt = Program.createTexProgram();

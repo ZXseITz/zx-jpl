@@ -1,9 +1,9 @@
-package ch.zxseitz.jpl.framework.config;
+package ch.zxseitz.jpl.graphics;
 
-import ch.zxseitz.jpl.framework.math.Matrix4;
-import ch.zxseitz.jpl.framework.math.Vector2;
-import ch.zxseitz.jpl.framework.math.Vector3;
-import ch.zxseitz.jpl.framework.math.Vector4;
+import ch.zxseitz.jpl.math.Matrix4;
+import ch.zxseitz.jpl.math.Vector2;
+import ch.zxseitz.jpl.math.Vector3;
+import ch.zxseitz.jpl.math.Vector4;
 import javafx.scene.paint.Color;
 
 import static org.lwjgl.opengl.GL45.*;

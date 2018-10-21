@@ -1,6 +1,6 @@
-package ch.zxseitz.jpl.framework.scene;
+package ch.zxseitz.jpl.graphics.scene;
 
-import ch.zxseitz.jpl.framework.math.Matrix4;
+import ch.zxseitz.jpl.math.Matrix4;
 import javafx.scene.paint.Color;
 
 public class Camera {

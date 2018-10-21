@@ -1,9 +1,9 @@
-package ch.zxseitz.jpl.framework.scene;
+package ch.zxseitz.jpl.graphics.scene;
 
-import ch.zxseitz.jpl.framework.config.Program;
-import ch.zxseitz.jpl.framework.math.Matrix4;
-import ch.zxseitz.jpl.framework.math.Vector3;
-import ch.zxseitz.jpl.framework.mesh.MeshTex;
+import ch.zxseitz.jpl.graphics.Program;
+import ch.zxseitz.jpl.math.Matrix4;
+import ch.zxseitz.jpl.math.Vector3;
+import ch.zxseitz.jpl.graphics.mesh.MeshTex;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
