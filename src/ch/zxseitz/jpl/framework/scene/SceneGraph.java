@@ -53,7 +53,7 @@ public class SceneGraph {
     public void render() {
         Color bg = camera.getBackground();
         glClearColor((float) bg.getRed(), (float) bg.getGreen(), (float) bg.getBlue(), 0f);
-        for (SceneObj node: nodes) {
+        for (SceneObj node : nodes) {
             render(camera.getMatrix(), node);
         }
     }
@@ -63,21 +63,17 @@ public class SceneGraph {
         var mesh = node.getMesh();
         if (mesh != null) {
             Program p = mesh.getProgram();
-            if (programId != p.id) {
-                p.use();
-                p.writeMat4("P", camera.getProjection());
-                p.writeVec4("ambient", ambient);
-                p.writeVec3("l_pos", lightPos);
-
-                programId = p.id;
-            }
+            p.use();
+            p.writeMat4("P", camera.getProjection());
+            p.writeVec4("ambient", ambient);
+            p.writeVec3("l_pos", lightPos);
+            p.writeMat4("T", t);
             if (mesh instanceof MeshTex) {
                 p.writeTexture("tex", ((MeshTex) mesh).getTexture());
             }
-            p.writeMat4("T", t);
             mesh.render();
         }
-        for (SceneObj node1: node.getChildren()) {
+        for (SceneObj node1 : node.getChildren()) {
             render(t, node1);
         }
     }

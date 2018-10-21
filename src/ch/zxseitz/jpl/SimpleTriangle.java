@@ -31,7 +31,6 @@ public class SimpleTriangle extends Application {
         } }, new int[] {
                 0, 1, 2
         }, AbstractMesh.PrimitiveType.TRIANGLES);
-        scene.getCamera().setProjection(Matrix4.createOrthogonalProjection(-2f, 2f, (float) width / height, 1f, 100f));
         scene.getNodes().add(new SceneObj(mesh, Matrix4.createTranslation(0, 0, -5f)));
     }
 
