@@ -1,23 +1,47 @@
-package ch.zxseitz.jpl.graphics;
+package ch.zxseitz.jpl.graphics.programs;
 
+import ch.zxseitz.jpl.graphics.Texture;
 import ch.zxseitz.jpl.math.Matrix4;
 import ch.zxseitz.jpl.math.Vector2;
 import ch.zxseitz.jpl.math.Vector3;
 import ch.zxseitz.jpl.math.Vector4;
 import javafx.scene.paint.Color;
 
+import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+
 import static org.lwjgl.opengl.GL45.*;
 
 public class Program {
+    private static final Charset utf8 = Charset.forName("UTF-8");
+
+    public final static Program NOLIGHT = createProgram(
+            "vertexShader.glsl", "fragmentShader.glsl");
+    public final static Program NOLIGHT_TEX = createProgram(
+            "vertexShaderTex.glsl", "fragmentShaderTex.glsl");
+    public final static Program NORMAL = createProgram(
+            "vertexShaderLight.glsl", "fragmentShaderLight.glsl");
+    public final static Program NORMAL_TEX = createProgram(
+            "vertexShaderLightTex.glsl", "fragmentShaderLightTex.glsl");
+
     public final int id;
     private final Shader vertexShader, fragmentShader;
 
     public Program(String vertexShaderPath, String fragmentShaderPath) {
         var id = glCreateProgram();
-        this.vertexShader = new Shader(vertexShaderPath, Shader.ShaderType.VERTEX_SHADER);
-        glAttachShader(id, this.vertexShader.id);
-        this.fragmentShader = new Shader(fragmentShaderPath, Shader.ShaderType.FRAGMENT_SHADER);
-        glAttachShader(id, this.fragmentShader.id);
+        var vid = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vid, loadShader(vertexShaderPath));
+        glCompileShader(vid);
+        glAttachShader(id, vid);
+        this.vertexShader = new Shader(vid, Shader.ShaderType.VERTEX_SHADER, vertexShaderPath);
+
+        var fid = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fid, loadShader(fragmentShaderPath));
+        glCompileShader(fid);
+        glAttachShader(id, fid);
+        this.fragmentShader = new Shader(fid, Shader.ShaderType.FRAGMENT_SHADER, fragmentShaderPath);
+
         glLinkProgram(id);
         if (glGetProgrami(id, GL_LINK_STATUS) == GL_FALSE) {
             throw new RuntimeException(String.format("Error linking program\n%s",
@@ -30,12 +54,16 @@ public class Program {
         return new Program("res/shaders/" + vertexShader, "res/shaders/" + fragmentShader);
     }
 
-    public static Program createNormalProgram() {
-        return createProgram("vertexShader.glsl", "fragmentShader.glsl");
-    }
-
-    public static Program createTexProgram() {
-        return createProgram("vertexShaderTex.glsl", "fragmentShaderTex.glsl");
+    private String loadShader(String path) {
+        try {
+            var file = new File(path);
+            var encoded = Files.readAllBytes(file.toPath());
+            return new String(encoded, utf8);
+        } catch (Exception e) {
+            System.err.println(String.format("Error reading shader %s", path));
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public Shader getVertexShader() {
@@ -60,7 +88,7 @@ public class Program {
     public int getAttribLocation(String name) {
         var location = glGetAttribLocation(this.id, name);
         if (location < 0)
-            throw new RuntimeException(String.format("Attribute %s has no location in program %d", name, id));
+            throw new RuntimeException(String.format("MeshAttribute %s has no location in program %d", name, id));
         return location;
     }
 

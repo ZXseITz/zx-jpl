@@ -1,10 +1,12 @@
 package ch.zxseitz.jpl.graphics.mesh;
 
-import ch.zxseitz.jpl.graphics.Program;
+import ch.zxseitz.jpl.graphics.programs.Program;
 import ch.zxseitz.jpl.graphics.Texture;
+import ch.zxseitz.jpl.utils.Triple;
 import javafx.scene.paint.Color;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 public class MeshFactory2D {
     private Program p;
@@ -22,11 +24,11 @@ public class MeshFactory2D {
     }
 
     public static float[] createNormalArray(int count) {
-        return createArray(new float[] {0f, 0f, 1f}, count);
+        return createArray(new float[]{0f, 0f, 1f}, count);
     }
 
     public static float[] createColorArray(Color color, int count) {
-        return createArray(new float[] {
+        return createArray(new float[]{
                 (float) color.getRed(),
                 (float) color.getGreen(),
                 (float) color.getBlue(),
@@ -46,32 +48,29 @@ public class MeshFactory2D {
         return mesh;
     }
 
-    private void configRect(AbstractMesh mesh, float width, float height, Color color, boolean tex) {
-        var mode = AbstractMesh.PrimitiveType.TRIANGLE_FAN;
+    private void configRect(Mesh mesh, float width, float height, Color color, boolean tex) {
+        var vertices = new ArrayList<Triple<String, Integer, float[]>>(4);
+        var mode = PrimitiveType.TRIANGLE_FAN;
         var indices = new int[]{
                 0, 1, 2, 3
         };
         var x = width / 2;
         var y = height / 2;
-        var pos = new float[]{
+        vertices.add(new Triple<>("pos", 3, new float[]{
                 -x, -y, 0f,
                 x, -y, 0f,
                 x, y, 0f,
                 -x, y, 0f,
-        };
-        var normals = createNormalArray(4);
-        var colors = createColorArray(color, 4);
-        float[][] vertices;
+        }));
+        vertices.add(new Triple<>("normal", 3, createNormalArray(4)));
+        vertices.add(new Triple<>("color", 4, createColorArray(color, 4)));
         if (tex) {
-            var uvs = new float[]{
+            vertices.add(new Triple<>("uv", 2, new float[]{
                     0f, 0f,
                     0f, 1f,
                     1f, 1f,
                     1f, 0f,
-            };
-            vertices = new float[][]{pos, normals, colors, uvs};
-        } else {
-            vertices = new float[][]{pos, normals, colors};
+            }));
         }
         mesh.addAll(vertices, indices, mode);
     }
@@ -88,11 +87,12 @@ public class MeshFactory2D {
         return mesh;
     }
 
-    private void configRegularPolygon(AbstractMesh mesh, float radius, int n, Color color, boolean tex) {
-        var mode = AbstractMesh.PrimitiveType.TRIANGLE_FAN;
+    private void configRegularPolygon(Mesh mesh, float radius, int n, Color color, boolean tex) {
+        var vertices = new ArrayList<Triple<String, Integer, float[]>>(4);
+        var mode = PrimitiveType.TRIANGLE_FAN;
         var indices = new int[n + 2];
-        var posBuffer = FloatBuffer.allocate(3*(n+2));
-        var uvBuffer = FloatBuffer.allocate(2*(n+2));
+        var posBuffer = FloatBuffer.allocate(3 * (n + 2));
+        var uvBuffer = FloatBuffer.allocate(2 * (n + 2));
         indices[0] = 0;
         posBuffer.put(0f);
         posBuffer.put(0f);
@@ -112,14 +112,11 @@ public class MeshFactory2D {
             uvBuffer.put(x * 0.5f + 0.5f);
             uvBuffer.put(y * 0.5f + 0.5f);
         }
-        var pos = posBuffer.flip().array();
-        var normals = createNormalArray(n+2);
-        var colors = createColorArray(color, n+2);
-        float[][] vertices;
+        vertices.add(new Triple<>("pos", 3, posBuffer.flip().array()));
+        vertices.add(new Triple<>("normal", 3, createNormalArray(n + 2)));
+        vertices.add(new Triple<>("color", 4, createColorArray(color, n + 2)));
         if (tex) {
-            vertices = new float[][]{pos, normals, colors, uvBuffer.flip().array()};
-        } else {
-            vertices = new float[][]{pos, normals, colors};
+            vertices.add(new Triple<>("uv", 2, uvBuffer.flip().array()));
         }
         mesh.addAll(vertices, indices, mode);
     }

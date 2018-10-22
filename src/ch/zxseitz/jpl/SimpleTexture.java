@@ -1,8 +1,8 @@
 package ch.zxseitz.jpl;
 
 import ch.zxseitz.jpl.graphics.Application;
-import ch.zxseitz.jpl.graphics.Program;
 import ch.zxseitz.jpl.graphics.Texture;
+import ch.zxseitz.jpl.graphics.programs.Program;
 import ch.zxseitz.jpl.math.Matrix4;
 import ch.zxseitz.jpl.graphics.mesh.MeshFactory2D;
 import ch.zxseitz.jpl.graphics.scene.SceneObj;
@@ -20,8 +20,7 @@ public class SimpleTexture extends Application {
         size.addListener(GraphicUtils.createResizeListenerStdOrtho(scene.getCamera()));
 
         //scene
-        var pt = Program.createTexProgram();
-        var meshFactoryTex = new MeshFactory2D(pt);
+        var meshFactoryTex = new MeshFactory2D(Program.NORMAL_TEX);
         var mesh = meshFactoryTex.createRectTex(2f, 2f, Color.WHITE,
                 Texture.createTexture("freebies.jpg"));
         var aspect = 16f/9f;

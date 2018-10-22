@@ -1,6 +1,6 @@
 package ch.zxseitz.jpl.graphics.scene;
 
-import ch.zxseitz.jpl.graphics.Program;
+import ch.zxseitz.jpl.graphics.programs.Program;
 import ch.zxseitz.jpl.math.Matrix4;
 import ch.zxseitz.jpl.math.Vector3;
 import ch.zxseitz.jpl.graphics.mesh.MeshTex;
