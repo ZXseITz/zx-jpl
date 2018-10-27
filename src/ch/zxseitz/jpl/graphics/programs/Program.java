@@ -137,6 +137,6 @@ public class Program {
     }
 
     public void writeMat4(String name, Matrix4 mat) {
-        glUniformMatrix4fv(getUniformLocation(name), true, mat.data);
+        glUniformMatrix4fv(getUniformLocation(name), true, mat.getData());
     }
 }

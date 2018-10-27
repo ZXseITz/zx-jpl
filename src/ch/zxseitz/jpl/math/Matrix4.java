@@ -21,7 +21,7 @@ public class Matrix4 {
     private static native void multiplyElementsC(float[] a, float[] b, float[] r);
     private static native void multiplyScalarC(float[] a, float b, float[] r);
 
-    public float[] data;
+    private float[] data;
 
     public Matrix4(float a11, float a12, float a13, float a14,
                    float a21, float a22, float a23, float a24,
@@ -46,6 +46,10 @@ public class Matrix4 {
 
     public Matrix4(Matrix4 mat) {
         this.data = Arrays.copyOf(mat.data, SIZE);
+    }
+
+    public float[] getData() {
+        return data;
     }
 
     public void add(Matrix4 mat) {
