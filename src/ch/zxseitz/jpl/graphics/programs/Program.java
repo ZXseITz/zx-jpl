@@ -16,10 +16,10 @@ import static org.lwjgl.opengl.GL45.*;
 public class Program {
     private static final Charset utf8 = Charset.forName("UTF-8");
 
-//    public final static Program NOLIGHT = createProgram(
-//            "vertexShader.glsl", "fragmentShader.glsl");
-//    public final static Program NOLIGHT_TEX = createProgram(
-//            "vertexShaderTex.glsl", "fragmentShaderTex.glsl");
+    public final static Program NOLIGHT = createProgram(
+            "vertexShader.glsl", "fragmentShader.glsl");
+    public final static Program NOLIGHT_TEX = createProgram(
+            "vertexShaderTex.glsl", "fragmentShaderTex.glsl");
     public final static Program NORMAL = createProgram(
             "vertexShaderLight.glsl", "fragmentShaderLight.glsl");
     public final static Program NORMAL_TEX = createProgram(
