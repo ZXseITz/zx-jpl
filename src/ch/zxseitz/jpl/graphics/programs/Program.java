@@ -7,15 +7,13 @@ import ch.zxseitz.jpl.math.Vector3;
 import ch.zxseitz.jpl.math.Vector4;
 import javafx.scene.paint.Color;
 
-import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL45.*;
 
 public class Program {
-    private static final Charset utf8 = Charset.forName("UTF-8");
-
     public final static Program NOLIGHT = createProgram(
             "vertexShader.glsl", "fragmentShader.glsl");
     public final static Program NOLIGHT_TEX = createProgram(
@@ -25,45 +23,90 @@ public class Program {
     public final static Program NORMAL_TEX = createProgram(
             "vertexShaderLightTex.glsl", "fragmentShaderLightTex.glsl");
 
-    public final int id;
-    private final Shader vertexShader, fragmentShader;
+    private final Map<String, Integer> attributes;
+    private final Map<String, String> uniforms;
+    public int id;
+    private Shader vertexShader, fragmentShader;
 
     public Program(String vertexShaderPath, String fragmentShaderPath) {
-        var id = glCreateProgram();
-        var vid = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vid, loadShader(vertexShaderPath));
-        glCompileShader(vid);
-        glAttachShader(id, vid);
-        this.vertexShader = new Shader(vid, Shader.ShaderType.VERTEX_SHADER, vertexShaderPath);
+        this.attributes = new HashMap<>();
+        this.uniforms = new HashMap<>();
 
-        var fid = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fid, loadShader(fragmentShaderPath));
-        glCompileShader(fid);
-        glAttachShader(id, fid);
-        this.fragmentShader = new Shader(fid, Shader.ShaderType.FRAGMENT_SHADER, fragmentShaderPath);
-
-        glLinkProgram(id);
-        if (glGetProgrami(id, GL_LINK_STATUS) == GL_FALSE) {
-            throw new RuntimeException(String.format("Error linking program\n%s",
-                    glGetProgramInfoLog(glGetProgrami(id, GL_INFO_LOG_LENGTH))));
+        try {
+            var id = glCreateProgram();
+            // vertex shader
+            var vid = glCreateShader(GL_VERTEX_SHADER);
+            glShaderSource(vid, parseShader(vertexShaderPath, true, true));
+            glCompileShader(vid);
+            glAttachShader(id, vid);
+            this.vertexShader = new Shader(vid, Shader.ShaderType.VERTEX_SHADER, vertexShaderPath);
+            // fragment shader
+            var fid = glCreateShader(GL_FRAGMENT_SHADER);
+            glShaderSource(fid, parseShader(fragmentShaderPath, false, true));
+            glCompileShader(fid);
+            glAttachShader(id, fid);
+            this.fragmentShader = new Shader(fid, Shader.ShaderType.FRAGMENT_SHADER, fragmentShaderPath);
+            // link
+            glLinkProgram(id);
+            if (glGetProgrami(id, GL_LINK_STATUS) == GL_FALSE) {
+                throw new RuntimeException(String.format("Error linking program\n%s",
+                        glGetProgramInfoLog(glGetProgrami(id, GL_INFO_LOG_LENGTH))));
+            }
+            this.id = id;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(-1);
         }
-        this.id = id;
     }
 
     public static Program createProgram(String vertexShader, String fragmentShader) {
         return new Program("res/shaders/" + vertexShader, "res/shaders/" + fragmentShader);
     }
 
-    private String loadShader(String path) {
-        try {
-            var file = new File(path);
-            var encoded = Files.readAllBytes(file.toPath());
-            return new String(encoded, utf8);
-        } catch (Exception e) {
-            System.err.println(String.format("Error reading shader %s", path));
-            e.printStackTrace();
+    private static int getVarSize(String v) {
+        switch (v) {
+            case "float":
+                return 1;
+            case "vec2":
+                return 2;
+            case "vec3":
+                return 3;
+            case "vec4":
+                return 4;
+            default:
+                return -1;
         }
-        return null;
+    }
+
+    private String parseShader(String path, boolean parseAttributes, boolean parseUniforms) throws IOException {
+        var file = new File(path);
+        var content = new StringBuilder();
+        try (var reader = new BufferedReader(new FileReader(file))) {
+            reader.lines().forEach(line -> {
+                content.append(line);
+                content.append('\n');
+                if (parseAttributes && line.startsWith("in")) {
+                    // shader attribute
+                    var args = line.split("\\s+");
+                    var size = getVarSize(args[1]);
+                    if (size < 0) throw new IllegalArgumentException("Unknown shader attribute " + args[1]);
+                    attributes.put(args[2].replace(";", ""), size);
+                } else if (parseUniforms && line.startsWith("uniform")) {
+                    // uniform variable
+                    var args = line.split("\\s+");
+                    uniforms.put(args[2].replace(";", ""), args[1]);
+                }
+            });
+        }
+        return content.toString();
+    }
+
+    public Map<String, Integer> getAttributes() {
+        return attributes;
+    }
+
+    public Map<String, String> getUniforms() {
+        return uniforms;
     }
 
     public Shader getVertexShader() {
