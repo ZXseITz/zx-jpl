@@ -1,7 +1,9 @@
 package ch.zxseitz.jpl.graphics.mesh;
 
+import ch.zxseitz.jpl.graphics.Texture;
 import ch.zxseitz.jpl.graphics.programs.Program;
-import ch.zxseitz.jpl.utils.Triple;
+import ch.zxseitz.jpl.graphics.programs.ShaderVariable;
+import ch.zxseitz.jpl.utils.Tuple;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,70 +12,74 @@ import java.util.Map;
 import static org.lwjgl.opengl.GL45.*;
 
 public class Mesh {
-  protected int vao, vboIdx;
-  protected Map<String, Integer> vbos;
-  protected PrimitiveType mode;
-  protected int idxLength;
+    private int vao, vboIdx;
+    private Map<String, Integer> vbos;
+    private PrimitiveType mode;
+    private int idxLength;
 
-  protected Program program;
+    private Program program;
+    private Texture tex;
 
-  public Mesh(Program program) {
-    this.program = program;
-    this.vao = glGenVertexArrays();
-    glBindVertexArray(this.vao);
-    this.vbos = new HashMap<>(5);
-  }
+    public Mesh(Program program) {
+        this.program = program;
+        this.vao = glGenVertexArrays();
+        glBindVertexArray(this.vao);
+        this.vbos = new HashMap<>(5);
+        for(var sh : program.getAttributes()) {
+            var id = glGenBuffers();
+            vbos.put(sh.name, id);
+        }
+        this.vboIdx = glGenBuffers();
+    }
 
-  public Program getProgram() {
-    return program;
-  }
+    public Program getProgram() {
+        return program;
+    }
 
-  public int getVao() {
-    return vao;
-  }
+    public Texture getTex() {
+        return tex;
+    }
 
-  public int getVboIdx() {
-    return vboIdx;
-  }
+    public void setTex(Texture tex) {
+        this.tex = tex;
+    }
 
-  public int getVbo(String name) {
-    return vbos.get(name);
-  }
+    public int getVao() {
+        return vao;
+    }
 
-  public void addAll(List<Triple<String, Integer, float[]>> vertices, int[] indices, PrimitiveType mode) {
-      this.mode = mode;
-      vbos.clear();
-      for(var attribute : vertices) {
-          var name = attribute.getFirst();
-          var size = attribute.getSecond();
-          var data = attribute.getThird();
-          vbos.put(name, registerFloatArray(name, size, data));
-      }
-      vboIdx = registerIndexArray(indices);
-  }
+    public int getVboIdx() {
+        return vboIdx;
+    }
 
-  protected int registerFloatArray(String name, int size, float[] data) {
-    var id = glGenBuffers();
-    glBindBuffer(GL_ARRAY_BUFFER, id);
-    glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
-    var location = program.getAttribLocation(name);
-    glEnableVertexAttribArray(location);
-    glBindBuffer(GL_ARRAY_BUFFER, id);
-    glVertexAttribPointer(location, size, GL_FLOAT, false, 0, 0);
-    return id;
-  }
+    public int getVbo(String name) {
+        return vbos.get(name);
+    }
 
-  protected int registerIndexArray(int[] indices) {
-    idxLength = indices.length;
-    var id = glGenBuffers();
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
-    return id;
-  }
+    public void addAll(List<Tuple<ShaderVariable, float[]>> vertices, int[] indices, PrimitiveType mode) {
+//        var attributes = program.getAttributes();
+//        if (attributes.size() != vertices.size()) throw new RuntimeException("Shader attributes don't match");
+        this.mode = mode;
+            for (var attribute : vertices) {
+                var sv = attribute.getFirst();
+//                if (!attributes.contains(sv)) throw new RuntimeException("Shader attributes don't match");
+                var data = attribute.getSecond();
+                var id = vbos.get(sv.name);
+                glBindBuffer(GL_ARRAY_BUFFER, id);
+                glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
+                var location = program.getAttribLocation(sv.name);
+                glEnableVertexAttribArray(location);
+                glBindBuffer(GL_ARRAY_BUFFER, id);
+                glVertexAttribPointer(location, sv.size, GL_FLOAT, false, 0, 0);
+            }
+        idxLength = indices.length;
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIdx);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
+    }
 
-  public void render() {
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIdx);
-    glDrawElements(mode.type, idxLength, GL_UNSIGNED_INT, 0);
-  }
+    public void render() {
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIdx);
+        glDrawElements(mode.type, idxLength, GL_UNSIGNED_INT, 0);
+    }
 }

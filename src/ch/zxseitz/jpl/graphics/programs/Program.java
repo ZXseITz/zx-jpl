@@ -1,6 +1,7 @@
 package ch.zxseitz.jpl.graphics.programs;
 
 import ch.zxseitz.jpl.graphics.Texture;
+import ch.zxseitz.jpl.graphics.scene.SceneGraph;
 import ch.zxseitz.jpl.math.Matrix4;
 import ch.zxseitz.jpl.math.Vector2;
 import ch.zxseitz.jpl.math.Vector3;
@@ -8,28 +9,58 @@ import ch.zxseitz.jpl.math.Vector4;
 import javafx.scene.paint.Color;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.lwjgl.opengl.GL45.*;
 
-public class Program {
-    public final static Program NOLIGHT = createProgram(
-            "vertexShader.glsl", "fragmentShader.glsl");
-    public final static Program NOLIGHT_TEX = createProgram(
-            "vertexShaderTex.glsl", "fragmentShaderTex.glsl");
-    public final static Program NORMAL = createProgram(
-            "vertexShaderLight.glsl", "fragmentShaderLight.glsl");
-    public final static Program NORMAL_TEX = createProgram(
-            "vertexShaderLightTex.glsl", "fragmentShaderLightTex.glsl");
+public abstract class Program {
+    public final static Program NOLIGHT = new Program(
+            "res/shaders/vertexShader.glsl", "res/shaders/fragmentShader.glsl") {
+        @Override
+        public void writeUniforms(SceneGraph scene, Matrix4 transformation, Texture texture) {
+            writeMat4("P", scene.getCamera().getProjection());
+            writeMat4("T", transformation);
+        }
+    };
+    public final static Program NOLIGHT_TEX = new Program(
+            "res/shaders/vertexShaderTex.glsl", "res/shaders/fragmentShaderTex.glsl") {
+        @Override
+        public void writeUniforms(SceneGraph scene, Matrix4 transformation, Texture texture) {
+            writeMat4("P", scene.getCamera().getProjection());
+            writeMat4("T", transformation);
+            writeTexture("tex", texture);
+        }
+    };
+    public final static Program NORMAL = new Program(
+            "res/shaders/vertexShaderLight.glsl", "res/shaders/fragmentShaderLight.glsl") {
+        @Override
+        public void writeUniforms(SceneGraph scene, Matrix4 transformation, Texture texture) {
+            writeMat4("P", scene.getCamera().getProjection());
+            writeMat4("T", transformation);
+            writeVec4("ambient", scene.getAmbient());
+            writeVec3("l_pos", scene.getLightPos());
+        }
+    };
+    public final static Program NORMAL_TEX = new Program(
+            "res/shaders/vertexShaderLightTex.glsl", "res/shaders/fragmentShaderLightTex.glsl") {
+        @Override
+        public void writeUniforms(SceneGraph scene, Matrix4 transformation, Texture texture) {
+            writeMat4("P", scene.getCamera().getProjection());
+            writeMat4("T", transformation);
+            writeVec4("ambient", scene.getAmbient());
+            writeVec3("l_pos", scene.getLightPos());
+            writeTexture("tex", texture);
+        }
+    };
 
-    private final Map<String, Integer> attributes;
+
+    private final Set<ShaderVariable> attributes;
     private final Map<String, String> uniforms;
     public int id;
     private Shader vertexShader, fragmentShader;
 
     public Program(String vertexShaderPath, String fragmentShaderPath) {
-        this.attributes = new HashMap<>();
+        this.attributes = new HashSet<>();
         this.uniforms = new HashMap<>();
 
         try {
@@ -59,10 +90,6 @@ public class Program {
         }
     }
 
-    public static Program createProgram(String vertexShader, String fragmentShader) {
-        return new Program("res/shaders/" + vertexShader, "res/shaders/" + fragmentShader);
-    }
-
     private static int getVarSize(String v) {
         switch (v) {
             case "float":
@@ -90,7 +117,7 @@ public class Program {
                     var args = line.split("\\s+");
                     var size = getVarSize(args[1]);
                     if (size < 0) throw new IllegalArgumentException("Unknown shader attribute " + args[1]);
-                    attributes.put(args[2].replace(";", ""), size);
+                    attributes.add(new ShaderVariable(args[2].replace(";", ""), size));
                 } else if (parseUniforms && line.startsWith("uniform")) {
                     // uniform variable
                     var args = line.split("\\s+");
@@ -101,7 +128,7 @@ public class Program {
         return content.toString();
     }
 
-    public Map<String, Integer> getAttributes() {
+    public Set<ShaderVariable> getAttributes() {
         return attributes;
     }
 
@@ -182,4 +209,14 @@ public class Program {
     public void writeMat4(String name, Matrix4 mat) {
         glUniformMatrix4fv(getUniformLocation(name), true, mat.getData());
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Program){
+            return id == ((Program) obj).id;
+        }
+        return false;
+    }
+
+    public abstract void writeUniforms(SceneGraph scene, Matrix4 transformation, Texture texture);
 }

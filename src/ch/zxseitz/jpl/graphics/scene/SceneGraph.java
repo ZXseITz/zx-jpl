@@ -1,9 +1,7 @@
 package ch.zxseitz.jpl.graphics.scene;
 
-import ch.zxseitz.jpl.graphics.programs.Program;
 import ch.zxseitz.jpl.math.Matrix4;
 import ch.zxseitz.jpl.math.Vector3;
-import ch.zxseitz.jpl.graphics.mesh.MeshTex;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
@@ -16,8 +14,6 @@ public class SceneGraph {
     private Vector3 lightPos; //TODO: improve
     private Color ambient; //TODO: improve
     private Camera camera; //TODO: multiple cams
-
-    private int programId = -1;
 
     public SceneGraph() {
         this.nodes = new ArrayList<>(25);
@@ -62,15 +58,8 @@ public class SceneGraph {
         var t = Matrix4.multiply(transform, node.getMatrix());
         var mesh = node.getMesh();
         if (mesh != null) {
-            Program p = mesh.getProgram();
-            p.use();
-            p.writeMat4("P", camera.getProjection());
-            p.writeVec4("ambient", ambient);
-            p.writeVec3("l_pos", lightPos);
-            p.writeMat4("T", t);
-            if (mesh instanceof MeshTex) {
-                p.writeTexture("tex", ((MeshTex) mesh).getTexture());
-            }
+            mesh.getProgram().use();
+            mesh.getProgram().writeUniforms(this, t, mesh.getTex());
             mesh.render();
         }
         for (SceneObj node1 : node.getChildren()) {
