@@ -1,10 +1,6 @@
 package ch.zxseitz.jpl.graphics.programs;
 
-import ch.zxseitz.jpl.graphics.Texture;
-import ch.zxseitz.jpl.math.Matrix4;
-import ch.zxseitz.jpl.math.Vector2;
-import ch.zxseitz.jpl.math.Vector3;
-import ch.zxseitz.jpl.math.Vector4;
+import ch.zxseitz.jpl.graphics.programs.uniforms.IUniform;
 
 import java.util.*;
 
@@ -14,11 +10,13 @@ public class Program {
     private int id;
     private List<Shader> shaders;
     private List<ShaderAttribute> attributes;
+    private List<IUniform> uniforms;
 
     public Program (Shader... shaders) {
         try {
             this.shaders = Collections.unmodifiableList(List.of(shaders));
             this.attributes = new ArrayList<>();
+            this.uniforms = new ArrayList<>();
             this.id = glCreateProgram();
             // attach shader
             for (var shader : shaders) {
@@ -50,14 +48,21 @@ public class Program {
         return attributes;
     }
 
+    public List<IUniform> getUniforms() {
+        return uniforms;
+    }
+
     public void use() {
         glUseProgram(this.id);
+        for (var uniform : uniforms) {
+            uniform.write(getUniformLocation(uniform.getName()));
+        }
     }
 
     public int getUniformLocation(String name) {
         var location = glGetUniformLocation(this.id, name);
         if (location < 0)
-            throw new RuntimeException(String.format("Uniform %s has no location in program %d", name, id));
+            throw new RuntimeException(String.format("AbstractUniform %s has no location in program %d", name, id));
         return location;
     }
 
@@ -66,50 +71,6 @@ public class Program {
         if (location < 0)
             throw new RuntimeException(String.format("Attribute %s has no location in program %d", name, id));
         return location;
-    }
-
-    public void writeBool(String name, boolean value) {
-        glUniform1i(getUniformLocation(name), value ? 1 : 0);
-    }
-
-    public void writeInt(String name, int value) {
-        glUniform1i(getUniformLocation(name), value);
-    }
-
-    public void writeTexture(String name, Texture tex) {
-        glUniform1i(getUniformLocation(name), tex.id);
-    }
-
-    public void writeFloat(String name, float value) {
-        glUniform1f(getUniformLocation(name), value);
-    }
-
-    public void writeVec2(String name, Vector2 value) {
-        glUniform2f(getUniformLocation(name), value.x, value.y);
-    }
-
-    public void writeVec2(String name, float x, float y) {
-        glUniform2f(getUniformLocation(name), x, y);
-    }
-
-    public void writeVec3(String name, float x, float y, float z) {
-        glUniform3f(getUniformLocation(name), x, y, z);
-    }
-
-    public void writeVec3(String name, Vector3 value) {
-        glUniform3f(getUniformLocation(name), value.x, value.y, value.z);
-    }
-
-    public void writeVec4(String name, float x, float y, float z, float w) {
-        glUniform4f(getUniformLocation(name), x, y, z, w);
-    }
-
-    public void writeVec4(String name, Vector4 value) {
-        glUniform4f(getUniformLocation(name), value.x, value.y, value.z, value.w);
-    }
-
-    public void writeMat4(String name, Matrix4 mat) {
-        glUniformMatrix4fv(getUniformLocation(name), true, mat.getData());
     }
 
     @Override

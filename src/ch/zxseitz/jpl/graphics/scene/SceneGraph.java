@@ -1,11 +1,9 @@
 package ch.zxseitz.jpl.graphics.scene;
 
 import ch.zxseitz.jpl.math.Matrix4;
-import ch.zxseitz.jpl.math.Vector3;
 import ch.zxseitz.jpl.math.Vector4;
 
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL45.*;
