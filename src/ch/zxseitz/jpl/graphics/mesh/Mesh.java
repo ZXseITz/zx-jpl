@@ -2,7 +2,7 @@ package ch.zxseitz.jpl.graphics.mesh;
 
 import ch.zxseitz.jpl.graphics.Texture;
 import ch.zxseitz.jpl.graphics.programs.Program;
-import ch.zxseitz.jpl.graphics.programs.ShaderVariable;
+import ch.zxseitz.jpl.graphics.programs.ShaderAttribute;
 import ch.zxseitz.jpl.utils.Tuple;
 
 import java.util.HashMap;
@@ -56,7 +56,7 @@ public class Mesh {
         return vbos.get(name);
     }
 
-    public void addAll(List<Tuple<ShaderVariable, float[]>> vertices, int[] indices, PrimitiveType mode) {
+    public void addAll(List<Tuple<ShaderAttribute, float[]>> vertices, int[] indices, PrimitiveType mode) {
 //        var attributes = program.getAttributes();
 //        if (attributes.size() != vertices.size()) throw new RuntimeException("Shader attributes don't match");
         this.mode = mode;

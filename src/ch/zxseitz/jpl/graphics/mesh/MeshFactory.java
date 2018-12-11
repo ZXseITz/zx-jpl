@@ -2,7 +2,7 @@ package ch.zxseitz.jpl.graphics.mesh;
 
 import ch.zxseitz.jpl.graphics.Texture;
 import ch.zxseitz.jpl.graphics.programs.Program;
-import ch.zxseitz.jpl.graphics.programs.ShaderVariable;
+import ch.zxseitz.jpl.graphics.programs.ShaderAttribute;
 import ch.zxseitz.jpl.utils.Tuple;
 import javafx.scene.paint.Color;
 
@@ -61,7 +61,7 @@ public class MeshFactory {
     }
     public Mesh createRect2D(float width, float height, Color color, Texture texture) {
         var mesh = new Mesh(program);
-        var vertices = new ArrayList<Tuple<ShaderVariable, float[]>>(4);
+        var vertices = new ArrayList<Tuple<ShaderAttribute, float[]>>(4);
         var mode = PrimitiveType.TRIANGLE_FAN;
         var indices = new int[]{
                 0, 1, 2, 3
@@ -69,20 +69,20 @@ public class MeshFactory {
         var x = width / 2;
         var y = height / 2;
         var attributes = program.getAttributes();
-        if (attributes.contains(ShaderVariable.POS))
-            vertices.add(new Tuple<>(ShaderVariable.POS, new float[]{
+        if (attributes.contains(ShaderAttribute.POS))
+            vertices.add(new Tuple<>(ShaderAttribute.POS, new float[]{
                     -x, -y, 0f,
                     x, -y, 0f,
                     x, y, 0f,
                     -x, y, 0f,
             }));
-        if(attributes.contains(ShaderVariable.NORMAL))
-            vertices.add(new Tuple<>(ShaderVariable.NORMAL, createNormalArray(4)));
-        if(color != null && attributes.contains(ShaderVariable.COLOR))
-            vertices.add(new Tuple<>(ShaderVariable.COLOR, createColorArray(color, 4)));
-        if (texture != null && attributes.contains(ShaderVariable.UV)) {
+        if(attributes.contains(ShaderAttribute.NORMAL))
+            vertices.add(new Tuple<>(ShaderAttribute.NORMAL, createNormalArray(4)));
+        if(color != null && attributes.contains(ShaderAttribute.COLOR))
+            vertices.add(new Tuple<>(ShaderAttribute.COLOR, createColorArray(color, 4)));
+        if (texture != null && attributes.contains(ShaderAttribute.UV)) {
             mesh.setTex(texture);
-            vertices.add(new Tuple<>(ShaderVariable.UV, new float[]{
+            vertices.add(new Tuple<>(ShaderAttribute.UV, new float[]{
                     0f, 0f,
                     0f, 1f,
                     1f, 1f,
