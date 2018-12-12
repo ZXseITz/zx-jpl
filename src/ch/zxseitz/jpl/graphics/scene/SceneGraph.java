@@ -31,8 +31,6 @@ public class SceneGraph {
      */
     public void render() {
         var camera = Camera.getCurrent();
-        Vector4 bg = camera.getBackground();
-        glClearColor(bg.x, bg.y, bg.z, 1f);
         for (SceneObj node : nodes) {
             render(camera.getMatrix(), node);
         }

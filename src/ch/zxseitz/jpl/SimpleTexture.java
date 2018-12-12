@@ -1,6 +1,7 @@
 package ch.zxseitz.jpl;
 
 import ch.zxseitz.jpl.graphics.Application;
+import ch.zxseitz.jpl.graphics.Color;
 import ch.zxseitz.jpl.graphics.Texture;
 import ch.zxseitz.jpl.graphics.mesh.MeshFactory;
 import ch.zxseitz.jpl.graphics.programs.Program;
@@ -12,7 +13,6 @@ import ch.zxseitz.jpl.graphics.scene.Camera;
 import ch.zxseitz.jpl.graphics.scene.SceneGraph;
 import ch.zxseitz.jpl.math.Matrix4;
 import ch.zxseitz.jpl.graphics.scene.SceneObj;
-import ch.zxseitz.jpl.math.Vector4;
 
 public class SimpleTexture extends Application {
     private SceneGraph scene;
@@ -52,7 +52,7 @@ public class SimpleTexture extends Application {
         scene = new SceneGraph(T);
         var factory = MeshFactory.getFactory(program);
         var texture = Texture.createTexture("freebies.jpg");
-        var mesh = factory.createRect2D(2f, 2f, Vector4.ONE, texture);
+        var mesh = factory.createRect2D(2f, 2f, Color.WHITE, texture);
         tex.setValue(texture.id);
         scene.getNodes().add(new SceneObj(mesh, Matrix4.createTranslation(0, 0, -5f)));
     }

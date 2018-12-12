@@ -1,8 +1,8 @@
 package ch.zxseitz.jpl.graphics.scene;
 
+import ch.zxseitz.jpl.graphics.Color;
 import ch.zxseitz.jpl.graphics.programs.uniforms.UniformMatrix4;
 import ch.zxseitz.jpl.math.Matrix4;
-import ch.zxseitz.jpl.math.Vector4;
 
 import static org.lwjgl.opengl.GL45.glClearColor;
 
@@ -16,13 +16,13 @@ public class Camera {
     private UniformMatrix4 P;
     private Matrix4 projection;
     private Matrix4 matrix;
-    private Vector4 background; //x red, y green, z blue
+    private Color background;
 
     public Camera(UniformMatrix4 p) {
         this.P = p;
-        this.projection = Matrix4.createOrthogonalProjection(-1f, 1f, -1f, 1f, -1f, 100f);
+        this.projection = Matrix4.createOrthogonalProjection(-1f, 1f, -1f, 1f, -1f, 10f);
         this.matrix = Matrix4.ID;
-        this.background = Vector4.ONE;
+        this.background = Color.WHITE;
     }
 
     public Matrix4 getProjection() {
@@ -42,16 +42,16 @@ public class Camera {
         this.matrix = matrix;
     }
 
-    public Vector4 getBackground() {
+    public Color getBackground() {
         return background;
     }
 
-    public void setBackground(Vector4 background) {
+    public void setBackground(Color background) {
         this.background = background;
     }
 
     public void use() {
-        glClearColor(background.x, background.y, background.z, background.w);
+        glClearColor(background.r, background.g, background.b, background.a);
         P.setValue(projection);
         current = this;
     }

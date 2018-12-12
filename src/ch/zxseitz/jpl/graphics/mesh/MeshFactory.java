@@ -1,9 +1,9 @@
 package ch.zxseitz.jpl.graphics.mesh;
 
+import ch.zxseitz.jpl.graphics.Color;
 import ch.zxseitz.jpl.graphics.Texture;
 import ch.zxseitz.jpl.graphics.programs.Program;
 import ch.zxseitz.jpl.graphics.programs.ShaderAttribute;
-import ch.zxseitz.jpl.math.Vector4;
 import ch.zxseitz.jpl.utils.Tuple;
 
 import java.nio.FloatBuffer;
@@ -43,12 +43,12 @@ public class MeshFactory {
         return createArray(new float[]{0f, 0f, 1f}, count);
     }
 
-    public static float[] createColorArray(Vector4 color, int count) {
+    public static float[] createColorArray(Color color, int count) {
         return createArray(new float[]{
-                color.x,
-                color.y,
-                color.z,
-                color.w
+                color.r,
+                color.g,
+                color.b,
+                color.a
         }, count);
     }
 
@@ -58,10 +58,10 @@ public class MeshFactory {
     }
 
     // 2D Factory
-    public Mesh createRect2D(float width, float height, Vector4 color) {
+    public Mesh createRect2D(float width, float height, Color color) {
         return createRect2D(width, height, color, null);
     }
-    public Mesh createRect2D(float width, float height, Vector4 color, Texture texture) {
+    public Mesh createRect2D(float width, float height, Color color, Texture texture) {
         var mesh = new Mesh(program);
         var vertices = new ArrayList<Tuple<ShaderAttribute, float[]>>(4);
         var mode = PrimitiveType.TRIANGLE_FAN;
