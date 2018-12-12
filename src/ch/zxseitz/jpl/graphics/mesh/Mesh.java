@@ -12,10 +12,11 @@ import java.util.Map;
 import static org.lwjgl.opengl.GL45.*;
 
 public class Mesh {
-    private int vao, vboIdx;
+    private int vao, ebo;
     private Map<String, Integer> vbos;
     private PrimitiveType mode;
     private int idxLength;
+    private boolean deleted;
 
     private Program program;
     private Texture tex;
@@ -24,12 +25,17 @@ public class Mesh {
         this.program = program;
         this.vao = glGenVertexArrays();
         glBindVertexArray(this.vao);
-        this.vbos = new HashMap<>(5);
+        this.vbos = new HashMap<>(4);
         for(var sh : program.getAttributes()) {
             var id = glGenBuffers();
+            var location = program.getAttribLocation(sh.name);
+            glBindBuffer(GL_ARRAY_BUFFER, id);
+            glEnableVertexAttribArray(location);
+            glVertexAttribPointer(location, sh.size, GL_FLOAT, false, 0, 0);
             vbos.put(sh.name, id);
         }
-        this.vboIdx = glGenBuffers();
+        this.ebo = glGenBuffers();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     }
 
     public Program getProgram() {
@@ -48,38 +54,43 @@ public class Mesh {
         return vao;
     }
 
-    public int getVboIdx() {
-        return vboIdx;
+    public int getEbo() {
+        return ebo;
     }
 
     public int getVbo(String name) {
         return vbos.get(name);
     }
 
-    public void addAll(List<Tuple<ShaderAttribute, float[]>> vertices, int[] indices, PrimitiveType mode) {
-//        var attributes = program.getAttributes();
-//        if (attributes.size() != vertices.size()) throw new RuntimeException("Shader attributes don't match");
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setVertices(List<Tuple<ShaderAttribute, float[]>> vertices, int[] indices, PrimitiveType mode) {
         this.mode = mode;
             for (var attribute : vertices) {
-                var sv = attribute.getFirst();
-//                if (!attributes.contains(sv)) throw new RuntimeException("Shader attributes don't match");
+                var id = vbos.get(attribute.getFirst().name);
                 var data = attribute.getSecond();
-                var id = vbos.get(sv.name);
                 glBindBuffer(GL_ARRAY_BUFFER, id);
                 glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
-                var location = program.getAttribLocation(sv.name);
-                glEnableVertexAttribArray(location);
-                glBindBuffer(GL_ARRAY_BUFFER, id);
-                glVertexAttribPointer(location, sv.size, GL_FLOAT, false, 0, 0);
             }
         idxLength = indices.length;
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIdx);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
     }
 
     public void render() {
         glBindVertexArray(vao);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIdx);
-        glDrawElements(mode.type, idxLength, GL_UNSIGNED_INT, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glDrawElements(mode.id, idxLength, GL_UNSIGNED_INT, 0);
+    }
+
+    public void destroy() {
+        deleted = true;
+        glDeleteVertexArrays(vao);
+        for (var id : vbos.values()) {
+            glDeleteBuffers(id);
+        }
+        glDeleteBuffers(ebo);
     }
 }

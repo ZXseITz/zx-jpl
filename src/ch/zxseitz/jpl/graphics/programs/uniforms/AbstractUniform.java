@@ -4,9 +4,8 @@ public abstract class AbstractUniform<T> implements IUniform {
     protected String name;
     protected T value;
 
-    AbstractUniform(String name, T value) {
+    AbstractUniform(String name) {
         this.name = name;
-        this.value = value;
     }
 
     public String getName() {

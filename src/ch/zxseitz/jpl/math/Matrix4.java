@@ -13,6 +13,8 @@ public class Matrix4 {
             0, 0, 1, 0,
             0, 0, 0, 1);
 
+    public static Matrix4 StdOrthogonalProjection = Matrix4.createOrthogonalProjection(-1f, 1f, -1f, 1f, -1f, 10f);
+
     private static final int SIZE = 16;
 
     private static native void addC(float[] a, float[] b, float[] r);

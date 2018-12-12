@@ -28,7 +28,7 @@ public class Shader {
             this.deleted = false;
             glShaderSource(id, loadShader(path));
             glCompileShader(id);
-            if (glGetShaderi(id, GL_LINK_STATUS) == GL_FALSE)
+            if (glGetShaderi(id, GL_COMPILE_STATUS) == GL_FALSE)
                 throw new Exception("Error compiling shader\n" + glGetShaderInfoLog(id));
         } catch (Exception e) {
             e.printStackTrace();

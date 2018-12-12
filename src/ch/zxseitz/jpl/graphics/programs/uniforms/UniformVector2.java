@@ -5,8 +5,8 @@ import ch.zxseitz.jpl.math.Vector2;
 import static org.lwjgl.opengl.GL45.glUniform2f;
 
 public class UniformVector2 extends AbstractUniform<Vector2> {
-    public UniformVector2(String name, Vector2 value) {
-        super(name, value);
+    public UniformVector2(String name) {
+        super(name);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package ch.zxseitz.jpl.graphics.scene;
 
+import ch.zxseitz.jpl.graphics.programs.uniforms.UniformMatrix4;
 import ch.zxseitz.jpl.math.Matrix4;
 import ch.zxseitz.jpl.math.Vector4;
 
@@ -10,25 +11,26 @@ import static org.lwjgl.opengl.GL45.*;
 
 public class SceneGraph {
     private final List<SceneObj> nodes;
-    private Camera camera;
+    private UniformMatrix4 T;
 
-    public SceneGraph() {
+    /**
+     * Constructor
+     * @param t uniform transformation matrix
+     */
+    public SceneGraph(UniformMatrix4 t) {
         this.nodes = new ArrayList<>(25);
-    }
-
-    public Camera getCamera() {
-        return camera;
-    }
-
-    public void setCamera(Camera camera) {
-        this.camera = camera;
+        this.T = t;
     }
 
     public List<SceneObj> getNodes() {
         return nodes;
     }
 
+    /**
+     * Renders the entire scene graph
+     */
     public void render() {
+        var camera = Camera.getCurrent();
         Vector4 bg = camera.getBackground();
         glClearColor(bg.x, bg.y, bg.z, 1f);
         for (SceneObj node : nodes) {
@@ -40,6 +42,7 @@ public class SceneGraph {
         var t = Matrix4.multiply(transform, node.getMatrix());
         var mesh = node.getMesh();
         if (mesh != null) {
+            this.T.setValue(t);
             mesh.getProgram().use();
             mesh.render();
         }

@@ -3,7 +3,11 @@ package ch.zxseitz.jpl;
 import ch.zxseitz.jpl.graphics.Application;
 import ch.zxseitz.jpl.graphics.mesh.PrimitiveType;
 import ch.zxseitz.jpl.graphics.programs.Program;
+import ch.zxseitz.jpl.graphics.programs.Shader;
 import ch.zxseitz.jpl.graphics.programs.ShaderAttribute;
+import ch.zxseitz.jpl.graphics.programs.uniforms.UniformMatrix4;
+import ch.zxseitz.jpl.graphics.scene.Camera;
+import ch.zxseitz.jpl.graphics.scene.SceneGraph;
 import ch.zxseitz.jpl.math.Matrix4;
 import ch.zxseitz.jpl.graphics.mesh.Mesh;
 import ch.zxseitz.jpl.graphics.scene.SceneObj;
@@ -13,29 +17,52 @@ import ch.zxseitz.jpl.utils.Tuple;
 import java.util.ArrayList;
 
 public class SimpleTriangle extends Application {
+    private SceneGraph scene;
+
     public SimpleTriangle() {
         super(450, 450, "SimpleTriangle");
     }
 
     @Override
     protected void init() {
-        // resizing
-        size.addListener(GraphicUtils.createResizeListenerStdOrtho(scene.getCamera()));
+        // init program
+        var vertexShader = new Shader("res/shaders/vertexShader.glsl", Shader.Type.VERTEX_SHADER);
+        var fragmentShader = new Shader("res/shaders/fragmentShader.glsl", Shader.Type.FRAGMENT_SHADER);
+        var program = new Program(vertexShader, fragmentShader);
+        vertexShader.destroy();
+        fragmentShader.destroy();
+
+        // init attributes
+        program.getAttributes().add(ShaderAttribute.POS);
+        program.getAttributes().add(ShaderAttribute.COLOR);
+
+        // init uniforms
+        var P = new UniformMatrix4("P");
+        var T = new UniformMatrix4("T");
+        program.getUniforms().add(P);
+        program.getUniforms().add(T);
+
+        // camera and resizing
+        var camera = new Camera(P);
+        camera.setProjection(Matrix4.StdOrthogonalProjection);
+        camera.use();
+        registerSizeChangedListener(GraphicUtils.createResizeListenerStdOrtho(camera));
 
         // scene
-        var mesh = new Mesh(Program.NOLIGHT);
+        scene = new SceneGraph(T);
+        var mesh = new Mesh(program);
         var vertices = new ArrayList<Tuple<ShaderAttribute, float[]>>(2);
         vertices.add(new Tuple<>(ShaderAttribute.POS, new float[] {
-                -1f, -1f, 0f,
-                1f, -1f, 0f,
-                1f, 1f, 0f
+                -0.8f, -0.6f, 0f,
+                0.8f, -0.6f, 0f,
+                0f, 0.6f, 0f
         }));
         vertices.add(new Tuple<>(ShaderAttribute.COLOR, new float[] {
                 1f, 0f, 0f, 1f,
                 0f, 1f, 0f, 1f,
                 0f, 0f, 1f, 1f
         }));
-        mesh.addAll(vertices, new int[] {
+        mesh.setVertices(vertices, new int[] {
                 0, 1, 2
         }, PrimitiveType.TRIANGLES);
         scene.getNodes().add(new SceneObj(mesh, Matrix4.createTranslation(0, 0, -5f)));
@@ -44,6 +71,11 @@ public class SimpleTriangle extends Application {
     @Override
     protected void updateFrame() {
 
+    }
+
+    @Override
+    protected void renderFrame() {
+        scene.render();
     }
 
     public static void main(String[] args) {

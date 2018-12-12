@@ -3,30 +3,32 @@ package ch.zxseitz.jpl.graphics.mesh;
 import ch.zxseitz.jpl.graphics.Texture;
 import ch.zxseitz.jpl.graphics.programs.Program;
 import ch.zxseitz.jpl.graphics.programs.ShaderAttribute;
+import ch.zxseitz.jpl.math.Vector4;
 import ch.zxseitz.jpl.utils.Tuple;
-import javafx.scene.paint.Color;
 
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class MeshFactory {
+    private static Set<ShaderAttribute> attributeSet;
     private static Map<Integer, MeshFactory> factoryMap;
     public static MeshFactory getFactory(Program program) {
-        return factoryMap.get(program.id);
+        var pid = program.getId();
+        if (!factoryMap.containsKey(pid)) {
+            for (var attribute : program.getAttributes()) {
+                if (!attributeSet.contains(attribute)) return null;
+            }
+            factoryMap.put(pid, new MeshFactory(program));
+        }
+        return factoryMap.get(pid);
     }
     static {
-        Program[] programs = new Program[] {
-                Program.NOLIGHT,
-                Program.NOLIGHT_TEX,
-                Program.NORMAL,
-                Program.NORMAL_TEX,
-        };
+        attributeSet = new HashSet<>(4);
+        attributeSet.add(ShaderAttribute.POS);
+        attributeSet.add(ShaderAttribute.NORMAL);
+        attributeSet.add(ShaderAttribute.COLOR);
+        attributeSet.add(ShaderAttribute.UV);
         factoryMap = new HashMap<>(4);
-        for (var program : programs) {
-            factoryMap.put(program.id, new MeshFactory(program));
-        }
     }
 
     public static float[] createArray(float[] pattern, int count) {
@@ -41,12 +43,12 @@ public class MeshFactory {
         return createArray(new float[]{0f, 0f, 1f}, count);
     }
 
-    public static float[] createColorArray(Color color, int count) {
+    public static float[] createColorArray(Vector4 color, int count) {
         return createArray(new float[]{
-                (float) color.getRed(),
-                (float) color.getGreen(),
-                (float) color.getBlue(),
-                (float) color.getOpacity()
+                color.x,
+                color.y,
+                color.z,
+                color.w
         }, count);
     }
 
@@ -56,10 +58,10 @@ public class MeshFactory {
     }
 
     // 2D Factory
-    public Mesh createRect2D(float width, float height, Color color) {
+    public Mesh createRect2D(float width, float height, Vector4 color) {
         return createRect2D(width, height, color, null);
     }
-    public Mesh createRect2D(float width, float height, Color color, Texture texture) {
+    public Mesh createRect2D(float width, float height, Vector4 color, Texture texture) {
         var mesh = new Mesh(program);
         var vertices = new ArrayList<Tuple<ShaderAttribute, float[]>>(4);
         var mode = PrimitiveType.TRIANGLE_FAN;
@@ -89,7 +91,7 @@ public class MeshFactory {
                     1f, 0f,
             }));
         }
-        mesh.addAll(vertices, indices, mode);
+        mesh.setVertices(vertices, indices, mode);
         return mesh;
     }
 
@@ -124,7 +126,7 @@ public class MeshFactory {
 //        if (tex) {
 //            vertices.add(new Triple<>("uv", 2, uvBuffer.flip().array()));
 //        }
-//        mesh.addAll(vertices, indices, mode);
+//        mesh.setVertices(vertices, indices, mode);
 //    }
 
     // 3D Factory

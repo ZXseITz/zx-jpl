@@ -4,33 +4,67 @@ import ch.zxseitz.jpl.graphics.Application;
 import ch.zxseitz.jpl.graphics.Texture;
 import ch.zxseitz.jpl.graphics.mesh.MeshFactory;
 import ch.zxseitz.jpl.graphics.programs.Program;
+import ch.zxseitz.jpl.graphics.programs.Shader;
+import ch.zxseitz.jpl.graphics.programs.ShaderAttribute;
+import ch.zxseitz.jpl.graphics.programs.uniforms.UniformInt;
+import ch.zxseitz.jpl.graphics.programs.uniforms.UniformMatrix4;
+import ch.zxseitz.jpl.graphics.scene.Camera;
+import ch.zxseitz.jpl.graphics.scene.SceneGraph;
 import ch.zxseitz.jpl.math.Matrix4;
 import ch.zxseitz.jpl.graphics.scene.SceneObj;
-import ch.zxseitz.jpl.graphics.GraphicUtils;
-import javafx.scene.paint.Color;
+import ch.zxseitz.jpl.math.Vector4;
 
 public class SimpleTexture extends Application {
+    private SceneGraph scene;
+
     public SimpleTexture() {
         super(800, 450, "SimpleTexture");
     }
 
     @Override
     protected void init() {
+        // init program
+        var vertexShader = new Shader("res/shaders/vertexShaderTex.glsl", Shader.Type.VERTEX_SHADER);
+        var fragmentShader = new Shader("res/shaders/fragmentShaderTex.glsl", Shader.Type.FRAGMENT_SHADER);
+        var program = new Program(vertexShader, fragmentShader);
+        vertexShader.destroy();
+        fragmentShader.destroy();
+
+        // init attributes
+        program.getAttributes().add(ShaderAttribute.POS);
+        program.getAttributes().add(ShaderAttribute.COLOR);
+        program.getAttributes().add(ShaderAttribute.UV);
+
+        // init uniforms
+        var P = new UniformMatrix4("P");
+        var T = new UniformMatrix4("T");
+        var tex = new UniformInt("tex");
+        program.getUniforms().add(P);
+        program.getUniforms().add(T);
+        program.getUniforms().add(tex);
+
         //resizing
-        size.addListener(GraphicUtils.createResizeListenerStdOrtho(scene.getCamera()));
+        var camera = new Camera(P);
+        camera.setProjection(Matrix4.createOrthogonalProjection(-1f, 1f, -1f, 1f, -1f, 10f));
+        camera.use();
 
         //scene
-        var factory = MeshFactory.getFactory(Program.NORMAL_TEX);
-        var mesh = factory.createRect2D(2f, 2f, Color.WHITE,
-                Texture.createTexture("freebies.jpg"));
-        var aspect = 16f/9f;
-        scene.getCamera().setProjection(Matrix4.createOrthogonalProjection(-1f * aspect, 1f * aspect, -1f, 1f, -1f, 100f));
+        scene = new SceneGraph(T);
+        var factory = MeshFactory.getFactory(program);
+        var texture = Texture.createTexture("freebies.jpg");
+        var mesh = factory.createRect2D(2f, 2f, Vector4.ONE, texture);
+        tex.setValue(texture.id);
         scene.getNodes().add(new SceneObj(mesh, Matrix4.createTranslation(0, 0, -5f)));
     }
 
     @Override
     protected void updateFrame() {
 
+    }
+
+    @Override
+    protected void renderFrame() {
+        scene.render();
     }
 
     public static void main(String[] args) {
