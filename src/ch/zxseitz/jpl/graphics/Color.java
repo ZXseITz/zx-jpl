@@ -12,6 +12,16 @@ public class Color {
     public static Color MARGENTA = new Color(1f, 0f, 1f);
     public static Color CYAN = new Color(0f, 1f, 1f);
 
+    public static Color fromByte(byte r, byte g, byte b) {
+        var x = 1f / 255;
+        return new Color(r * x, g * x, b * x, 1f);
+    }
+
+    public static Color fromByte(byte r, byte g, byte b, byte a) {
+        var x = 1f / 255;
+        return new Color(r * x, g * x, b * x, a * x);
+    }
+
     public final float r;
     public final float g;
     public final float b;
@@ -39,6 +49,8 @@ public class Color {
     private static float clamp(float value) {
         return value < 0f ? 0f : value > 1f ? 1f : value;
     }
+
+    //todo arithmetic handle alpha channel correctly
 
     public Color add(Color color) {
         return Color.add(this, color);

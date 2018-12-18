@@ -28,13 +28,13 @@ public class SimpleTriangle extends Application {
         // init program
         var vertexShader = new Shader("res/shaders/vertexShader.glsl", Shader.Type.VERTEX_SHADER);
         var fragmentShader = new Shader("res/shaders/fragmentShader.glsl", Shader.Type.FRAGMENT_SHADER);
-        var program = new Program(vertexShader, fragmentShader);
+        var program = new Program(new Shader[]{
+                vertexShader, fragmentShader
+        }, new ShaderAttribute[]{
+                ShaderAttribute.POS, ShaderAttribute.COLOR
+        });
         vertexShader.destroy();
         fragmentShader.destroy();
-
-        // init attributes
-        program.getAttributes().add(ShaderAttribute.POS);
-        program.getAttributes().add(ShaderAttribute.COLOR);
 
         // init uniforms
         var P = new UniformMatrix4("P");
@@ -42,14 +42,10 @@ public class SimpleTriangle extends Application {
         program.getUniforms().add(P);
         program.getUniforms().add(T);
 
-        // camera and resizing
-        var camera = new Camera(P);
-        camera.setProjection(Matrix4.StdOrthogonalProjection);
-        camera.use();
-        registerSizeChangedListener(GraphicUtils.createResizeListenerStdOrtho(camera));
 
         // scene
-        scene = new SceneGraph(T);
+        scene = new SceneGraph(P, T);
+        registerSizeChangedListener(GraphicUtils.createResizeListenerStdOrtho(scene.getCamera()));
         var mesh = new Mesh(program);
         var vertices = new ArrayList<Tuple<ShaderAttribute, float[]>>(2);
         vertices.add(new Tuple<>(ShaderAttribute.POS, new float[] {

@@ -14,7 +14,6 @@ public final class GraphicUtils {
             } else {
                 camera.setProjection(Matrix4.createOrthogonalProjection(-1f, 1f, -1 / aspect, 1 / aspect, -1f, 100f));
             }
-            camera.use();
         };
     }
 }

@@ -1,6 +1,7 @@
 package ch.zxseitz.jpl.graphics.programs;
 
 import ch.zxseitz.jpl.graphics.programs.uniforms.IUniform;
+import ch.zxseitz.jpl.utils.Tuple;
 
 import java.util.*;
 
@@ -12,10 +13,10 @@ public class Program {
     private List<ShaderAttribute> attributes;
     private List<IUniform> uniforms;
 
-    public Program (Shader... shaders) {
+    public Program (Shader[] shaders, ShaderAttribute[] attributes) {
         try {
             this.shaders = Collections.unmodifiableList(List.of(shaders));
-            this.attributes = new ArrayList<>();
+            this.attributes = Collections.unmodifiableList(List.of(attributes));
             this.uniforms = new ArrayList<>();
             this.id = glCreateProgram();
             // attach shader

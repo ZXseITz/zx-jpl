@@ -13,7 +13,7 @@ public class Matrix4 {
             0, 0, 1, 0,
             0, 0, 0, 1);
 
-    public static Matrix4 StdOrthogonalProjection = Matrix4.createOrthogonalProjection(-1f, 1f, -1f, 1f, -1f, 10f);
+    public static Matrix4 STD_ORTHOGONAL_PROJECTION = Matrix4.createOrthogonalProjection(-1f, 1f, -1f, 1f, -1f, 10f);
 
     private static final int SIZE = 16;
 

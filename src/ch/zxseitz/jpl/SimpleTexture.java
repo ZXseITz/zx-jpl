@@ -26,14 +26,16 @@ public class SimpleTexture extends Application {
         // init program
         var vertexShader = new Shader("res/shaders/vertexShaderTex.glsl", Shader.Type.VERTEX_SHADER);
         var fragmentShader = new Shader("res/shaders/fragmentShaderTex.glsl", Shader.Type.FRAGMENT_SHADER);
-        var program = new Program(vertexShader, fragmentShader);
+        var program = new Program(new Shader[] {
+                vertexShader,
+                fragmentShader
+        }, new ShaderAttribute[]{
+                ShaderAttribute.POS,
+                ShaderAttribute.COLOR,
+                ShaderAttribute.UV
+        });
         vertexShader.destroy();
         fragmentShader.destroy();
-
-        // init attributes
-        program.getAttributes().add(ShaderAttribute.POS);
-        program.getAttributes().add(ShaderAttribute.COLOR);
-        program.getAttributes().add(ShaderAttribute.UV);
 
         // init uniforms
         var P = new UniformMatrix4("P");
@@ -43,13 +45,8 @@ public class SimpleTexture extends Application {
         program.getUniforms().add(T);
         program.getUniforms().add(tex);
 
-        //resizing
-        var camera = new Camera(P);
-        camera.setProjection(Matrix4.createOrthogonalProjection(-1f, 1f, -1f, 1f, -1f, 10f));
-        camera.use();
-
         //scene
-        scene = new SceneGraph(T);
+        scene = new SceneGraph(P, T);
         var factory = MeshFactory.getFactory(program);
         var texture = Texture.createTexture("freebies.jpg");
         var mesh = factory.createRect2D(2f, 2f, Color.WHITE, texture);
