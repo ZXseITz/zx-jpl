@@ -9,10 +9,13 @@ import ch.zxseitz.jpl.graphics.programs.Shader;
 import ch.zxseitz.jpl.graphics.programs.ShaderAttribute;
 import ch.zxseitz.jpl.graphics.programs.uniforms.UniformInt;
 import ch.zxseitz.jpl.graphics.programs.uniforms.UniformMatrix4;
-import ch.zxseitz.jpl.graphics.scene.Camera;
 import ch.zxseitz.jpl.graphics.scene.SceneGraph;
 import ch.zxseitz.jpl.math.Matrix4;
 import ch.zxseitz.jpl.graphics.scene.SceneObj;
+
+import static org.lwjgl.opengl.GL45.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL45.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL45.glClear;
 
 public class SimpleTexture extends Application {
     private SceneGraph scene;
@@ -61,6 +64,7 @@ public class SimpleTexture extends Application {
 
     @Override
     protected void renderFrame() {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         scene.render();
     }
 

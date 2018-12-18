@@ -16,6 +16,10 @@ import ch.zxseitz.jpl.utils.Tuple;
 
 import java.util.ArrayList;
 
+import static org.lwjgl.opengl.GL45.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL45.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL45.glClear;
+
 public class SimpleTriangle extends Application {
     private SceneGraph scene;
 
@@ -66,11 +70,11 @@ public class SimpleTriangle extends Application {
 
     @Override
     protected void updateFrame() {
-
     }
 
     @Override
     protected void renderFrame() {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         scene.render();
     }
 
