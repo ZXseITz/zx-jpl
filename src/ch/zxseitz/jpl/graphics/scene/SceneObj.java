@@ -1,37 +1,36 @@
 package ch.zxseitz.jpl.graphics.scene;
 
 import ch.zxseitz.jpl.math.Matrix4;
-import ch.zxseitz.jpl.graphics.mesh.AbstractMesh;
+import ch.zxseitz.jpl.graphics.mesh.Mesh;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SceneObj {
-    private AbstractMesh mesh;
-    private Matrix4 matrix;
-
     private final List<SceneObj> children;
+    private Mesh mesh;
+    private Matrix4 transformation;
 
-    public SceneObj(AbstractMesh mesh, Matrix4 matrix) {
+    public SceneObj(Mesh mesh, Matrix4 matrix) {
         this.children = new ArrayList<>(10);
-        this.matrix = matrix;
+        this.transformation = matrix;
         this.mesh = mesh;
     }
 
-    public AbstractMesh getMesh() {
+    public Mesh getMesh() {
         return mesh;
     }
 
-    public void setMesh(AbstractMesh mesh) {
+    public void setMesh(Mesh mesh) {
         this.mesh = mesh;
     }
 
-    public Matrix4 getMatrix() {
-        return matrix;
+    public Matrix4 getTransformation() {
+        return transformation;
     }
 
-    public void setMatrix(Matrix4 matrix) {
-        this.matrix = matrix;
+    public void setTransformation(Matrix4 transformation) {
+        this.transformation = transformation;
     }
 
     public List<SceneObj> getChildren() {

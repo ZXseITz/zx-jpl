@@ -1,33 +1,39 @@
 package ch.zxseitz.jpl.graphics;
 
-import ch.zxseitz.jpl.graphics.scene.SceneGraph;
-import ch.zxseitz.jpl.utils.Tuple;
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleObjectProperty;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL45.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public abstract class Application {
-    protected final Property<Tuple<Integer, Integer>> size;
+    private List<ISizeChanged> sizeChangedListeners;
+    private int width, height;
     private final String title;
-    protected final SceneGraph scene;
     private long window;
 
-
     public Application(int width, int height, String title) {
-        this.size = new SimpleObjectProperty<>(new Tuple<>(width, height));
+        this.width = width;
+        this.height = height;
         this.title = title;
-        this.scene = new SceneGraph();
+        this.sizeChangedListeners = new ArrayList<>(1);
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 
     public final void run() {
@@ -58,7 +64,7 @@ public abstract class Application {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
         // Create the window
-        window = glfwCreateWindow(size.getValue().getFirst(), size.getValue().getSecond(), title, NULL, NULL);
+        window = glfwCreateWindow(width, height, title, NULL, NULL);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
@@ -104,28 +110,34 @@ public abstract class Application {
         // bindings available for use.
         GL.createCapabilities();
         glClearDepth(1.);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-//    glDisable(GL_CULL_FACE);
 
         glfwSetWindowSizeCallback(window, (window1, w, h) -> {
+            width = w;
+            height = h;
             glViewport(0, 0, w, h);
-            size.setValue(new Tuple<>(w, h));
+            for (var listener : sizeChangedListeners) {
+                listener.change(w, h);
+            }
         });
-
         init();
-
         while (!glfwWindowShouldClose(window)) {
             updateFrame();
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            scene.render();
+            renderFrame();
             glfwSwapBuffers(window);
             // Poll for window events. The key callback above will only be invoked during this call.
             glfwPollEvents();
         }
     }
 
-    protected abstract void init();
+    public void registerSizeChangedListener(ISizeChanged listener) {
+        sizeChangedListeners.add(listener);
+    }
 
+    public void removeSizeChangedListener(ISizeChanged listener) {
+        sizeChangedListeners.remove(listener);
+    }
+
+    protected abstract void init();
     protected abstract void updateFrame();
+    protected abstract void renderFrame();
 }
