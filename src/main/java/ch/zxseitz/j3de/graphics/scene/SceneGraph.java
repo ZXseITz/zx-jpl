@@ -47,7 +47,7 @@ public class SceneGraph {
     }
 
     private void render(Matrix4 transform, SceneObj node) {
-        var t = Matrix4.multiply(transform, node.getTransformation());
+        var t = transform.multiply(node.getTransformation());
         var mesh = node.getMesh();
         if (mesh != null) {
             this.uTransformation.setValue(t);

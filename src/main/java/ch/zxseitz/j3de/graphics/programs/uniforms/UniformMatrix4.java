@@ -11,6 +11,6 @@ public class UniformMatrix4 extends AbstractUniform<Matrix4> {
 
     @Override
     public void write(int location) {
-        glUniformMatrix4fv(location, true, value.getData());
+        glUniformMatrix4fv(location, true, value.extract());
     }
 }

@@ -1,7 +1,5 @@
 package ch.zxseitz.j3de.math;
 
-import java.util.Arrays;
-
 public class Matrix4 {
     static {
         System.load(System.getProperty("user.dir") + "/libs/j3de_native.dll");
@@ -13,23 +11,22 @@ public class Matrix4 {
             0, 0, 1, 0,
             0, 0, 0, 1);
 
-    public static Matrix4 STD_ORTHOGONAL_PROJECTION = Matrix4.createOrthogonalProjection(-1f, 1f, -1f, 1f, -1f, 10f);
-
     private static final int SIZE = 16;
 
+    private static native boolean equalsC(float[] a, float[] b, float t);
     private static native void addC(float[] a, float[] b, float[] r);
     private static native void subtractC(float[] a, float[] b, float[] r);
     private static native void multiplyC(float[] a, float[] b, float[] r);
     private static native void multiplyElementsC(float[] a, float[] b, float[] r);
-    private static native void multiplyScalarC(float[] a, float b, float[] r);
+    private static native void multiplyScalarC(float[] a, float s, float[] r);
 
-    private float[] data;
+    private final float[] data;
 
     public Matrix4(float a11, float a12, float a13, float a14,
                    float a21, float a22, float a23, float a24,
                    float a31, float a32, float a33, float a34,
                    float a41, float a42, float a43, float a44) {
-        data = new float[]{
+        this.data = new float[]{
                 a11, a12, a13, a14,
                 a21, a22, a23, a24,
                 a31, a32, a33, a34,
@@ -43,75 +40,72 @@ public class Matrix4 {
 
     public Matrix4(float[] data) {
         if (data.length != SIZE) throw new RuntimeException("Invalid Matrix size");
-        this.data = data;
+        this.data = new float[SIZE];
+        System.arraycopy(data, 0, this.data, 0, SIZE);
     }
 
     public Matrix4(Matrix4 mat) {
-        this.data = Arrays.copyOf(mat.data, SIZE);
+        this.data = new float[SIZE];
+        System.arraycopy(mat.data, 0, this.data, 0, SIZE);
     }
 
-    public float[] getData() {
-        return data;
+    public Matrix4 add(Matrix4 mat) {
+        var result = new Matrix4();
+        addC(data, mat.data, result.data);
+        return result;
     }
 
-    public void add(Matrix4 mat) {
-        float[] r = new float[SIZE];
-        addC(data, mat.data, r);
-        data = r;
+    public Matrix4 subtract(Matrix4 mat) {
+        var result = new Matrix4();
+        subtractC(data, mat.data, result.data);
+        return result;
     }
 
-    public void subtract(Matrix4 mat) {
-        float[] r = new float[SIZE];
-        subtractC(data, mat.data, r);
-        data = r;
+    public Matrix4 multiply(Matrix4 mat) {
+        var result = new Matrix4();
+        multiplyC(data, mat.data, result.data);
+        return result;
     }
 
-    public void multiply(Matrix4 mat) {
-        float[] r = new float[SIZE];
-        multiplyC(data, mat.data, r);
-        data = r;
+    public Matrix4 multiplyElements(Matrix4 mat) {
+        var result = new Matrix4();
+        multiplyElementsC(data, mat.data, result.data);
+        return result;
     }
 
-    public void multiplyElements(Matrix4 mat) {
-        float[] r = new float[SIZE];
-        multiplyElementsC(data, mat.data, r);
-        data = r;
+    public Matrix4 multiplyScalar(float s) {
+        var result = new Matrix4();
+        multiplyScalarC(data, s, result.data);
+        return result;
     }
 
-    public void multiplyScalar(float s) {
-        float[] r = new float[SIZE];
-        multiplyScalarC(data, s, r);
-        data = r;
+    public float[] extract() {
+        var buffer = new float[SIZE];
+        System.arraycopy(data, 0, buffer, 0, SIZE);
+        return buffer;
     }
 
-    public static Matrix4 add(Matrix4 a, Matrix4 b) {
-        float[] r = new float[SIZE];
-        addC(a.data, b.data, r);
-        return new Matrix4(r);
+    @Override
+    public boolean equals(Object obj) {
+//        if (obj instanceof Matrix4 mat) {
+        if (obj instanceof Matrix4) {
+            var mat = (Matrix4) obj;
+            return equalsC(data, mat.data, MathUtils.TOLERANCE);
+        }
+        return false;
     }
 
-    public static Matrix4 subtract(Matrix4 a, Matrix4 b) {
-        float[] r = new float[SIZE];
-        subtractC(a.data, b.data, r);
-        return new Matrix4(r);
-    }
-
-    public static Matrix4 multiply(Matrix4 a, Matrix4 b) {
-        float[] r = new float[SIZE];
-        multiplyC(a.data, b.data, r);
-        return new Matrix4(r);
-    }
-
-    public static Matrix4 multiplyElements(Matrix4 a, Matrix4 b) {
-        float[] r = new float[SIZE];
-        multiplyElementsC(a.data, b.data, r);
-        return new Matrix4(r);
-    }
-
-    public static Matrix4 multiplyScalar(Matrix4 a, float s) {
-        float[] r = new float[SIZE];
-        multiplyScalarC(a.data, s, r);
-        return new Matrix4(r);
+    @Override
+    public String toString() {
+        return String.format("""
+     [
+       %.3f, %.3f, %.3f, %.3f
+       %.3f, %.3f, %.3f, %.3f
+       %.3f, %.3f, %.3f, %.3f
+       %.3f, %.3f, %.3f, %.3f
+     ]
+     """, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8],
+                data[9], data[10], data[11], data[12], data[13], data[14], data[15]);
     }
 
     public static Matrix4 createTranslation(float x, float y, float z) {
@@ -131,6 +125,10 @@ public class Matrix4 {
                 0f, 0f, 0f, 1f
         );
     }
+
+    // todo create trigonometric lookup tables
+
+    public static final Matrix4 STD_ORTHOGONAL_PROJECTION = Matrix4.createOrthogonalProjection(-1f, 1f, -1f, 1f, -1f, 10f);
 
     public static Matrix4 createRotation(Vector3 axis, float phi) {
         var sin = (float) Math.sin(phi);

@@ -10,7 +10,7 @@ public class Vector3 {
     public static final Vector3 Y = new Vector3(0f, 1f, 0f);
     public static final Vector3 Z = new Vector3(0f, 0f, 1f);
 
-    public float x, y, z;
+    public final float x, y, z;
 
     public Vector3(float x, float y, float z) {
         this.x = x;
@@ -30,34 +30,44 @@ public class Vector3 {
         this.z = 0;
     }
 
-    public void add(Vector3 vec) {
-        x += vec.x;
-        y += vec.y;
-        z += vec.z;
+    public Vector3 add(Vector3 vec) {
+        return new Vector3(
+                x + vec.x,
+                y + vec.y,
+                z + vec.z
+        );
     }
 
-    public void subtract(Vector3 vec) {
-        x -= vec.x;
-        y -= vec.y;
-        z -= vec.z;
+    public Vector3 subtract(Vector3 vec) {
+        return new Vector3(
+                x - vec.x,
+                y - vec.y,
+                z - vec.z
+        );
     }
 
-    public void multiply(Vector3 vec) {
-        x *= vec.x;
-        y *= vec.y;
-        z *= vec.z;
+    public Vector3 multiply(Vector3 vec) {
+        return new Vector3(
+                x * vec.x,
+                y * vec.y,
+                z * vec.z
+        );
     }
 
-    public void divide(Vector3 vec) {
-        x /= vec.x;
-        y /= vec.y;
-        z /= vec.z;
+    public Vector3 divide(Vector3 vec) {
+        return new Vector3(
+                x / vec.x,
+                y / vec.y,
+                z / vec.z
+        );
     }
 
-    public void scale(float s) {
-        x *= s;
-        y *= s;
-        z *= s;
+    public Vector3 scale(float s) {
+        return new Vector3(
+                x * s,
+                y * s,
+                z * s
+        );
     }
 
     public float norm() {
@@ -80,7 +90,23 @@ public class Vector3 {
         );
     }
 
-    public Vector4 toHomogen() {
+    public Vector4 toHomogenous() {
         return new Vector4(x, y, z, 1f);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+//        if (obj instanceof Vector3 vec) {
+        if (obj instanceof Vector3) {
+            var vec = (Vector3) obj;
+            return MathUtils.isFloatEquals(x, vec.x) && MathUtils.isFloatEquals(y, vec.y)
+                    && MathUtils.isFloatEquals(z, vec.z);
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("(%.3f, %.3f, %.3f)", x, y, z);
     }
 }

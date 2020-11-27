@@ -6,41 +6,36 @@ public class Vector2 {
     public static final Vector2 X = new Vector2(1f, 0f);
     public static final Vector2 Y = new Vector2(0f, 1f);
 
-    public float x, y;
+    public final float x, y;
 
     public Vector2(float x, float y) {
         this.x = x;
         this.y = y;
     }
 
-    public Vector2(Vector2 vec) {
-        this.x = vec.x;
-        this.y = vec.y;
+    public Vector2(Vector2 a) {
+        this.x = a.x;
+        this.y = a.y;
     }
 
-    public void add(Vector2 vec) {
-        x += vec.x;
-        y += vec.y;
+    public Vector2 add(Vector2 vec) {
+        return new Vector2(x + vec.x, y + vec.y);
     }
 
-    public void subtract(Vector2 vec) {
-        x -= vec.x;
-        y -= vec.y;
+    public Vector2 subtract(Vector2 vec) {
+        return new Vector2(x - vec.x, y - vec.y);
     }
 
-    public void multiply(Vector2 vec) {
-        x *= vec.x;
-        y *= vec.y;
+    public Vector2 multiply(Vector2 vec) {
+        return new Vector2(x * vec.x, y * vec.y);
     }
 
-    public void divide(Vector2 vec) {
-        x /= vec.x;
-        y /= vec.y;
+    public Vector2 divide(Vector2 vec) {
+        return new Vector2(x / vec.x, y / vec.y);
     }
 
-    public void scale(float s) {
-        x *= s;
-        y *= s;
+    public Vector2 scale(float s) {
+        return new Vector2(x * s, y * s);
     }
 
     public float norm() {
@@ -51,7 +46,22 @@ public class Vector2 {
         return x * x + y * y;
     }
 
-    public float dot(Vector2 vec) {
-        return x * vec.x + y * vec.y;
+    public float dot(Vector2 v) {
+        return x * v.x + y * v.y;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+//        if (obj instanceof Vector2 vec) {
+        if (obj instanceof Vector2) {
+            var vec = (Vector2) obj;
+            return MathUtils.isFloatEquals(x, vec.x) && MathUtils.isFloatEquals(y, vec.y);
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("(%.3f, %.3f)", x, y);
     }
 }
