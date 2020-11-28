@@ -14,10 +14,6 @@ import ch.zxseitz.j3de.windows.ApplicationOptions;
 
 import java.nio.file.Paths;
 
-import static org.lwjgl.opengl.GL45.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL45.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL45.glClear;
-
 public class SimpleTexture extends Application {
     public static void main(String[] args) {
         launch(args);
@@ -67,13 +63,7 @@ public class SimpleTexture extends Application {
     }
 
     @Override
-    protected void updateFrame() {
-
-    }
-
-    @Override
-    protected void renderFrame() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    protected void update(double delta) {
         scene.render();
     }
 }

@@ -1,5 +1,6 @@
 package ch.zxseitz.j3de;
 
+import ch.zxseitz.j3de.exceptions.J3deException;
 import ch.zxseitz.j3de.exceptions.WindowException;
 import ch.zxseitz.j3de.graphics.ISizeChanged;
 import ch.zxseitz.j3de.windows.ApplicationOptions;
@@ -26,7 +27,7 @@ public abstract class Application {
             var app = (Application) clazz.getConstructor().newInstance();
 
             app.setUp();
-            app.start();
+            app.run();
             app.terminate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -40,8 +41,40 @@ public abstract class Application {
         this.sizeChangedListeners = new ArrayList<>(1);
     }
 
+    public List<ISizeChanged> getSizeChangedListeners() {
+        return sizeChangedListeners;
+    }
+
+    /**
+     * Configures the application before init the game.
+     *
+     * @return application options.
+     */
     protected ApplicationOptions applicationInit() {
         return new ApplicationOptions("J3de Application", 450, 450);
+    }
+
+    /**
+     * Configures the game: Setup shader programs and scene.
+     *
+     * @throws Exception
+     */
+    protected abstract void initGame() throws Exception;
+
+    /**
+     * Updates scene.
+     *
+     * @param delta elapsed time since the last frame was rendered.
+     * @throws Exception
+     */
+    protected abstract void update(double delta) throws Exception;
+
+    /**
+     * Set a flag to close this application.
+     * This method does not interrupt the current frame
+     */
+    protected void close() {
+        glfwSetWindowShouldClose(window, true);
     }
 
     private void setUp() throws Exception {
@@ -99,13 +132,14 @@ public abstract class Application {
         glfwShowWindow(window);
     }
 
-    private void start() throws Exception {
+    private void run() throws Exception {
         // This line is critical for LWJGL's interoperation with GLFW's
         // OpenGL context, or any context that is managed externally.
         // LWJGL detects the context that is current in the current thread,
         // creates the GLCapabilities instance and makes the OpenGL
         // bindings available for use.
         GL.createCapabilities();
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClearDepth(1.);
 
         glfwSetWindowSizeCallback(window, (window1, w, h) -> {
@@ -115,12 +149,17 @@ public abstract class Application {
             }
         });
         initGame();
+        var previousFrameTime = glfwGetTime();
         while (!glfwWindowShouldClose(window)) {
-            updateFrame();
-            renderFrame();
-            glfwSwapBuffers(window);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             // Poll for window events. The key callback above will only be invoked during this call.
             glfwPollEvents();
+
+            var frameTime = glfwGetTime();
+            update(frameTime - previousFrameTime);
+
+            glfwSwapBuffers(window);
+            previousFrameTime = frameTime;
         }
     }
 
@@ -133,16 +172,4 @@ public abstract class Application {
         glfwTerminate();
         glfwSetErrorCallback(null).free();
     }
-
-    public void registerSizeChangedListener(ISizeChanged listener) {
-        sizeChangedListeners.add(listener);
-    }
-
-    public void removeSizeChangedListener(ISizeChanged listener) {
-        sizeChangedListeners.remove(listener);
-    }
-
-    protected abstract void initGame() throws Exception;
-    protected abstract void updateFrame();
-    protected abstract void renderFrame();
 }
