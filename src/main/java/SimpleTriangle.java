@@ -1,4 +1,4 @@
-import ch.zxseitz.j3de.graphics.Application;
+import ch.zxseitz.j3de.Application;
 import ch.zxseitz.j3de.graphics.mesh.PrimitiveType;
 import ch.zxseitz.j3de.graphics.programs.Program;
 import ch.zxseitz.j3de.graphics.programs.Shader;
@@ -10,6 +10,7 @@ import ch.zxseitz.j3de.graphics.mesh.Mesh;
 import ch.zxseitz.j3de.graphics.scene.SceneObj;
 import ch.zxseitz.j3de.graphics.GraphicUtils;
 import ch.zxseitz.j3de.utils.Tuple;
+import ch.zxseitz.j3de.windows.ApplicationOptions;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -26,7 +27,12 @@ public class SimpleTriangle extends Application {
     private SceneGraph scene;
 
     @Override
-    protected void init() throws Exception {
+    protected ApplicationOptions applicationInit() {
+        return new ApplicationOptions("Simple Triangle", 450, 450);
+    }
+
+    @Override
+    protected void initGame() throws Exception {
         // init program
         var vertexShader = new Shader(Paths.get(getClass().getClassLoader()
                 .getResource(  "shaders/vertexShader.glsl").toURI()), Shader.Type.VERTEX_SHADER);

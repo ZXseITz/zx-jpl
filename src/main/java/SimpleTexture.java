@@ -1,4 +1,4 @@
-import ch.zxseitz.j3de.graphics.Application;
+import ch.zxseitz.j3de.Application;
 import ch.zxseitz.j3de.graphics.Color;
 import ch.zxseitz.j3de.graphics.Texture;
 import ch.zxseitz.j3de.graphics.mesh.MeshFactory;
@@ -10,6 +10,7 @@ import ch.zxseitz.j3de.graphics.programs.uniforms.UniformMatrix4;
 import ch.zxseitz.j3de.graphics.scene.SceneGraph;
 import ch.zxseitz.j3de.math.Matrix4;
 import ch.zxseitz.j3de.graphics.scene.SceneObj;
+import ch.zxseitz.j3de.windows.ApplicationOptions;
 
 import java.nio.file.Paths;
 
@@ -25,7 +26,12 @@ public class SimpleTexture extends Application {
     private SceneGraph scene;
 
     @Override
-    protected void init() throws Exception {
+    protected ApplicationOptions applicationInit() {
+        return new ApplicationOptions("Simple Texture", 450, 450);
+    }
+
+    @Override
+    protected void initGame() throws Exception {
         // init program
         var vertexShader = new Shader(Paths.get(getClass().getClassLoader()
                 .getResource( "shaders/vertexShaderTex.glsl").toURI()), Shader.Type.VERTEX_SHADER);
