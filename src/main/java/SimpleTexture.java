@@ -1,4 +1,5 @@
 import ch.zxseitz.j3de.Application;
+import ch.zxseitz.j3de.exceptions.J3deException;
 import ch.zxseitz.j3de.graphics.Color;
 import ch.zxseitz.j3de.graphics.Texture;
 import ch.zxseitz.j3de.graphics.mesh.MeshFactory;
@@ -11,8 +12,6 @@ import ch.zxseitz.j3de.graphics.scene.SceneGraph;
 import ch.zxseitz.j3de.math.Matrix4;
 import ch.zxseitz.j3de.graphics.scene.SceneObj;
 import ch.zxseitz.j3de.windows.ApplicationOptions;
-
-import java.nio.file.Paths;
 
 public class SimpleTexture extends Application {
     public static void main(String[] args) {
@@ -27,12 +26,12 @@ public class SimpleTexture extends Application {
     }
 
     @Override
-    protected void initGame() throws Exception {
+    protected void initGame() throws J3deException {
         // init program
-        var vertexShader = new Shader(Paths.get(getClass().getClassLoader()
-                .getResource( "shaders/vertexShaderTex.glsl").toURI()), Shader.Type.VERTEX_SHADER);
-        var fragmentShader = new Shader(Paths.get(getClass().getClassLoader()
-                .getResource( "shaders/fragmentShaderTex.glsl").toURI()), Shader.Type.FRAGMENT_SHADER);
+        var vertexShader = new Shader(getClassResource( "shaders/vertexShaderTex.glsl"),
+                Shader.Type.VERTEX_SHADER);
+        var fragmentShader = new Shader(getClassResource( "shaders/fragmentShaderTex.glsl"),
+                Shader.Type.FRAGMENT_SHADER);
         var program = new Program(new Shader[] {
                 vertexShader,
                 fragmentShader
@@ -55,15 +54,15 @@ public class SimpleTexture extends Application {
         //scene
         scene = new SceneGraph(P, T);
         var factory = MeshFactory.getFactory(program);
-        var texture = new Texture(Paths.get(getClass().getClassLoader()
-                .getResource("textures/freebies.jpg").toURI()));
+        assert factory != null;
+        var texture = new Texture(getClassResource("textures/freebies.jpg"));
         var mesh = factory.createRect2D(2f, 2f, Color.WHITE, texture);
         tex.setValue(texture.id);
         scene.getNodes().add(new SceneObj(mesh, Matrix4.createTranslation(0, 0, -5f)));
     }
 
     @Override
-    protected void update(double delta) {
+    protected void updateGame(double delta) {
         scene.render();
     }
 }

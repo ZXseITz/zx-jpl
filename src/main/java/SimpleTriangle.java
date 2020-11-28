@@ -1,4 +1,5 @@
 import ch.zxseitz.j3de.Application;
+import ch.zxseitz.j3de.exceptions.J3deException;
 import ch.zxseitz.j3de.graphics.mesh.PrimitiveType;
 import ch.zxseitz.j3de.graphics.programs.Program;
 import ch.zxseitz.j3de.graphics.programs.Shader;
@@ -12,7 +13,6 @@ import ch.zxseitz.j3de.graphics.GraphicUtils;
 import ch.zxseitz.j3de.utils.Tuple;
 import ch.zxseitz.j3de.windows.ApplicationOptions;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class SimpleTriangle extends Application {
@@ -28,12 +28,12 @@ public class SimpleTriangle extends Application {
     }
 
     @Override
-    protected void initGame() throws Exception {
+    protected void initGame() throws J3deException {
         // init program
-        var vertexShader = new Shader(Paths.get(getClass().getClassLoader()
-                .getResource(  "shaders/vertexShader.glsl").toURI()), Shader.Type.VERTEX_SHADER);
-        var fragmentShader = new Shader(Paths.get(getClass().getClassLoader()
-                .getResource( "shaders/fragmentShader.glsl").toURI()), Shader.Type.FRAGMENT_SHADER);
+        var vertexShader = new Shader(getClassResource(  "shaders/vertexShader.glsl"),
+                Shader.Type.VERTEX_SHADER);
+        var fragmentShader = new Shader(getClassResource( "shaders/fragmentShader.glsl"),
+                Shader.Type.FRAGMENT_SHADER);
         var program = new Program(new Shader[]{
                 vertexShader, fragmentShader
         }, new ShaderAttribute[]{
@@ -70,7 +70,7 @@ public class SimpleTriangle extends Application {
     }
 
     @Override
-    protected void update(double delta) {
+    protected void updateGame(double delta) {
         scene.render();
     }
 }

@@ -1,6 +1,7 @@
 package ch.zxseitz.j3de;
 
 import ch.zxseitz.j3de.exceptions.J3deException;
+import ch.zxseitz.j3de.exceptions.ResourceNotFoundException;
 import ch.zxseitz.j3de.exceptions.WindowException;
 import ch.zxseitz.j3de.graphics.ISizeChanged;
 import ch.zxseitz.j3de.windows.ApplicationOptions;
@@ -10,8 +11,11 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -31,6 +35,14 @@ public abstract class Application {
             app.terminate();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public static Path getClassResource(String path) throws ResourceNotFoundException {
+        try {
+            return Paths.get(Objects.requireNonNull(Application.class.getClassLoader().getResource(path)).toURI());
+        } catch (Exception e) {
+            throw new ResourceNotFoundException(path);
         }
     }
 
@@ -59,7 +71,7 @@ public abstract class Application {
      *
      * @throws Exception
      */
-    protected abstract void initGame() throws Exception;
+    protected abstract void initGame() throws J3deException;
 
     /**
      * Updates scene.
@@ -67,7 +79,7 @@ public abstract class Application {
      * @param delta elapsed time since the last frame was rendered.
      * @throws Exception
      */
-    protected abstract void update(double delta) throws Exception;
+    protected abstract void updateGame(double delta) throws J3deException;
 
     /**
      * Set a flag to close this application.
@@ -77,7 +89,7 @@ public abstract class Application {
         glfwSetWindowShouldClose(window, true);
     }
 
-    private void setUp() throws Exception {
+    private void setUp() throws J3deException {
         // Setup an error callback. The default implementation
         // will print the error message in System.err.
         GLFWErrorCallback.createPrint(System.err).set();
@@ -132,7 +144,7 @@ public abstract class Application {
         glfwShowWindow(window);
     }
 
-    private void run() throws Exception {
+    private void run() throws J3deException {
         // This line is critical for LWJGL's interoperation with GLFW's
         // OpenGL context, or any context that is managed externally.
         // LWJGL detects the context that is current in the current thread,
@@ -156,7 +168,7 @@ public abstract class Application {
             glfwPollEvents();
 
             var frameTime = glfwGetTime();
-            update(frameTime - previousFrameTime);
+            updateGame(frameTime - previousFrameTime);
 
             glfwSwapBuffers(window);
             previousFrameTime = frameTime;
