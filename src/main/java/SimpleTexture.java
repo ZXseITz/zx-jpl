@@ -18,11 +18,11 @@ import static org.lwjgl.opengl.GL45.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL45.glClear;
 
 public class SimpleTexture extends Application {
-    private SceneGraph scene;
-
-    public SimpleTexture() {
-        super(800, 450, "SimpleTexture");
+    public static void main(String[] args) {
+        launch(args);
     }
+
+    private SceneGraph scene;
 
     @Override
     protected void init() throws Exception {
@@ -69,9 +69,5 @@ public class SimpleTexture extends Application {
     protected void renderFrame() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         scene.render();
-    }
-
-    public static void main(String[] args) {
-        (new SimpleTexture()).run();
     }
 }

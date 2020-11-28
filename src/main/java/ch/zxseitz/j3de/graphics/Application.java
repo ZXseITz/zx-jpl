@@ -17,37 +17,21 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public abstract class Application {
     private List<ISizeChanged> sizeChangedListeners;
-    private int width, height;
-    private final String title;
     private long window;
 
-    public Application(int width, int height, String title) {
-        this.width = width;
-        this.height = height;
-        this.title = title;
+    public Application() {
         this.sizeChangedListeners = new ArrayList<>(1);
     }
 
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public final void run() {
+    protected static void launch(String... args) {
         try {
-            setUp();
-            start();
+            // todo verify
+            var clazz = Class.forName(Thread.currentThread().getStackTrace()[2].getClassName());
+            var app = (Application) clazz.getConstructor().newInstance();
 
-            // Free the window callbacks and destroy the window
-            glfwFreeCallbacks(window);
-            glfwDestroyWindow(window);
-
-            // Terminate GLFW and free the error callback
-            glfwTerminate();
-            glfwSetErrorCallback(null).free();
+            app.setUp();
+            app.start();
+            app.terminate();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,7 +52,8 @@ public abstract class Application {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
         // Create the window
-        window = glfwCreateWindow(width, height, title, NULL, NULL);
+
+        window = glfwCreateWindow(450, 450, "title", NULL, NULL);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
@@ -116,8 +101,6 @@ public abstract class Application {
         glClearDepth(1.);
 
         glfwSetWindowSizeCallback(window, (window1, w, h) -> {
-            width = w;
-            height = h;
             glViewport(0, 0, w, h);
             for (var listener : sizeChangedListeners) {
                 listener.change(w, h);
@@ -131,6 +114,16 @@ public abstract class Application {
             // Poll for window events. The key callback above will only be invoked during this call.
             glfwPollEvents();
         }
+    }
+
+    private void terminate() {
+        // Free the window callbacks and destroy the window
+        glfwFreeCallbacks(window);
+        glfwDestroyWindow(window);
+
+        // Terminate GLFW and free the error callback
+        glfwTerminate();
+        glfwSetErrorCallback(null).free();
     }
 
     public void registerSizeChangedListener(ISizeChanged listener) {

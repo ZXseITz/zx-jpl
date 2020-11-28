@@ -19,11 +19,11 @@ import static org.lwjgl.opengl.GL45.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL45.glClear;
 
 public class SimpleTriangle extends Application {
-    private SceneGraph scene;
-
-    public SimpleTriangle() {
-        super(450, 450, "SimpleTriangle");
+    public static void main(String[] args) {
+        launch(args);
     }
+
+    private SceneGraph scene;
 
     @Override
     protected void init() throws Exception {
@@ -75,9 +75,5 @@ public class SimpleTriangle extends Application {
     protected void renderFrame() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         scene.render();
-    }
-
-    public static void main(String[] args) {
-        (new SimpleTriangle()).run();
     }
 }
