@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.lwjgl.opengl.GL45.*;
 
 public class Texture {
-    private static AtomicInteger count = new AtomicInteger();
+    private static final AtomicInteger count = new AtomicInteger(1);
 
     public final int id;
     private final int width, height;

@@ -6,9 +6,10 @@ import ch.zxseitz.j3de.graphics.mesh.MeshFactory;
 import ch.zxseitz.j3de.graphics.programs.Program;
 import ch.zxseitz.j3de.graphics.programs.Shader;
 import ch.zxseitz.j3de.graphics.programs.ShaderAttribute;
-import ch.zxseitz.j3de.graphics.scene.SceneGraph;
+import ch.zxseitz.j3de.graphics.scene.Scene;
+import ch.zxseitz.j3de.graphics.scene.components.MeshComponent;
 import ch.zxseitz.j3de.math.Matrix4;
-import ch.zxseitz.j3de.graphics.scene.SceneObj;
+import ch.zxseitz.j3de.graphics.scene.Actor;
 import ch.zxseitz.j3de.windows.ApplicationOptions;
 import ch.zxseitz.j3de.windows.Key;
 import ch.zxseitz.j3de.windows.KeyActionType;
@@ -18,7 +19,8 @@ public class SimpleTexture extends Application {
         launch(args);
     }
 
-    private SceneGraph scene;
+    private Scene scene;
+    private Texture texture;
 
     @Override
     protected ApplicationOptions applicationInit() {
@@ -44,13 +46,15 @@ public class SimpleTexture extends Application {
         fragmentShader.destroy();
 
         //scene
-        scene = new SceneGraph(program);
+        scene = new Scene(program);
         var factory = MeshFactory.getFactory(program);
         assert factory != null;
-        var texture = new Texture(getClassResource("textures/freebies.jpg"));
+        texture = new Texture(getClassResource("textures/freebies.jpg"));
         var mesh = factory.createRect2D(2f, 2f, Color.WHITE, texture);
-        program.writeUniform("tex", texture.id);
-        scene.getNodes().add(new SceneObj(mesh, Matrix4.createTranslation(0, 0, -5f)));
+        var component = new MeshComponent(mesh);
+        var actor = new Actor(scene, Matrix4.createTranslation(0, 0, -5f));
+        actor.getComponents().add(component);
+        scene.getActors().add(actor);
 
         // keymap
         addKeyListener((key, keyActionType) -> {
@@ -62,6 +66,8 @@ public class SimpleTexture extends Application {
 
     @Override
     protected void updateGame(double delta) throws J3deException {
-        scene.render();
+        //todo move texture to mesh component
+        scene.getProgram().writeUniform("tex", texture.id);
+        scene.update(delta);
     }
 }

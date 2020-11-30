@@ -4,10 +4,11 @@ import ch.zxseitz.j3de.graphics.mesh.PrimitiveType;
 import ch.zxseitz.j3de.graphics.programs.Program;
 import ch.zxseitz.j3de.graphics.programs.Shader;
 import ch.zxseitz.j3de.graphics.programs.ShaderAttribute;
-import ch.zxseitz.j3de.graphics.scene.SceneGraph;
+import ch.zxseitz.j3de.graphics.scene.Scene;
+import ch.zxseitz.j3de.graphics.scene.components.MeshComponent;
 import ch.zxseitz.j3de.math.Matrix4;
 import ch.zxseitz.j3de.graphics.mesh.Mesh;
-import ch.zxseitz.j3de.graphics.scene.SceneObj;
+import ch.zxseitz.j3de.graphics.scene.Actor;
 import ch.zxseitz.j3de.utils.GraphicUtils;
 import ch.zxseitz.j3de.utils.Tuple;
 import ch.zxseitz.j3de.windows.ApplicationOptions;
@@ -21,7 +22,7 @@ public class SimpleTriangle extends Application {
         launch(args);
     }
 
-    private SceneGraph scene;
+    private Scene scene;
 
     @Override
     protected ApplicationOptions applicationInit() {
@@ -44,7 +45,7 @@ public class SimpleTriangle extends Application {
         fragmentShader.destroy();
 
         // scene
-        scene = new SceneGraph(program);
+        scene = new Scene(program);
         var mesh = new Mesh(program);
         var vertices = new ArrayList<Tuple<ShaderAttribute, float[]>>(2);
         vertices.add(new Tuple<>(ShaderAttribute.POS, new float[] {
@@ -60,7 +61,10 @@ public class SimpleTriangle extends Application {
         mesh.setVertices(vertices, new int[] {
                 0, 1, 2
         }, PrimitiveType.TRIANGLES);
-        scene.getNodes().add(new SceneObj(mesh, Matrix4.createTranslation(0, 0, -5f)));
+        var component = new MeshComponent(mesh);
+        var actor = new Actor(scene, Matrix4.createTranslation(0, 0, -5f));
+        actor.getComponents().add(component);
+        scene.getActors().add(actor);
 
         // keymap
         addKeyListener((key, keyActionType) -> {
@@ -73,6 +77,6 @@ public class SimpleTriangle extends Application {
 
     @Override
     protected void updateGame(double delta) throws J3deException {
-        scene.render();
+        scene.update(delta);
     }
 }
