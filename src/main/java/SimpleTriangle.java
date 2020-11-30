@@ -11,9 +11,9 @@ import ch.zxseitz.j3de.graphics.mesh.Mesh;
 import ch.zxseitz.j3de.graphics.scene.Actor;
 import ch.zxseitz.j3de.utils.GraphicUtils;
 import ch.zxseitz.j3de.utils.Tuple;
-import ch.zxseitz.j3de.windows.ApplicationOptions;
-import ch.zxseitz.j3de.windows.Key;
-import ch.zxseitz.j3de.windows.KeyActionType;
+import ch.zxseitz.j3de.window.ApplicationOptions;
+import ch.zxseitz.j3de.window.Key;
+import ch.zxseitz.j3de.window.KeyActionType;
 
 import java.io.IOException;
 import java.util.ArrayList;

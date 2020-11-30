@@ -2,7 +2,7 @@ package ch.zxseitz.j3de.utils;
 
 import ch.zxseitz.j3de.math.Matrix4;
 import ch.zxseitz.j3de.graphics.scene.Camera;
-import ch.zxseitz.j3de.windows.IWindowSizeListener;
+import ch.zxseitz.j3de.window.IWindowSizeListener;
 
 public final class GraphicUtils {
     private GraphicUtils() {}

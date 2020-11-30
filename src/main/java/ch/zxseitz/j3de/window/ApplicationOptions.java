@@ -1,4 +1,4 @@
-package ch.zxseitz.j3de.windows;
+package ch.zxseitz.j3de.window;
 
 public class ApplicationOptions {
     private String title;

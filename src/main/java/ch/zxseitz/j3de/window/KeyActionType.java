@@ -1,4 +1,4 @@
-package ch.zxseitz.j3de.windows;
+package ch.zxseitz.j3de.window;
 
 import static org.lwjgl.glfw.GLFW.*;
 

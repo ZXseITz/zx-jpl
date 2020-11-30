@@ -10,9 +10,9 @@ import ch.zxseitz.j3de.graphics.scene.Scene;
 import ch.zxseitz.j3de.graphics.scene.components.MeshComponent;
 import ch.zxseitz.j3de.math.Matrix4;
 import ch.zxseitz.j3de.graphics.scene.Actor;
-import ch.zxseitz.j3de.windows.ApplicationOptions;
-import ch.zxseitz.j3de.windows.Key;
-import ch.zxseitz.j3de.windows.KeyActionType;
+import ch.zxseitz.j3de.window.ApplicationOptions;
+import ch.zxseitz.j3de.window.Key;
+import ch.zxseitz.j3de.window.KeyActionType;
 
 import java.io.IOException;
 

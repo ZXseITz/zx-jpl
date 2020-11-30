@@ -3,7 +3,7 @@ package ch.zxseitz.j3de;
 import ch.zxseitz.j3de.exceptions.J3deException;
 import ch.zxseitz.j3de.exceptions.ResourceNotFoundException;
 import ch.zxseitz.j3de.exceptions.WindowException;
-import ch.zxseitz.j3de.windows.*;
+import ch.zxseitz.j3de.window.*;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
