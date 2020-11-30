@@ -3,8 +3,7 @@ package ch.zxseitz.j3de;
 import ch.zxseitz.j3de.exceptions.J3deException;
 import ch.zxseitz.j3de.exceptions.ResourceNotFoundException;
 import ch.zxseitz.j3de.exceptions.WindowException;
-import ch.zxseitz.j3de.graphics.ISizeChanged;
-import ch.zxseitz.j3de.windows.ApplicationOptions;
+import ch.zxseitz.j3de.windows.*;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -13,9 +12,7 @@ import org.lwjgl.system.MemoryStack;
 import java.nio.IntBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -47,14 +44,13 @@ public abstract class Application {
     }
 
     private long window;
-    protected List<ISizeChanged> sizeChangedListeners;
+    // todo custom keymap
+    protected final List<IWindowKeyListener> keyDownListeners;
+    protected final List<IWindowSizeListener> sizeChangedListeners;
 
     public Application() {
+        this.keyDownListeners = new ArrayList<>(1);
         this.sizeChangedListeners = new ArrayList<>(1);
-    }
-
-    public List<ISizeChanged> getSizeChangedListeners() {
-        return sizeChangedListeners;
     }
 
     /**
@@ -69,7 +65,7 @@ public abstract class Application {
     /**
      * Configures the game: Setup shader programs and scene.
      *
-     * @throws Exception
+     * @throws J3deException
      */
     protected abstract void initGame() throws J3deException;
 
@@ -77,7 +73,7 @@ public abstract class Application {
      * Updates scene.
      *
      * @param delta elapsed time since the last frame was rendered.
-     * @throws Exception
+     * @throws J3deException
      */
     protected abstract void updateGame(double delta) throws J3deException;
 
@@ -87,6 +83,22 @@ public abstract class Application {
      */
     protected void close() {
         glfwSetWindowShouldClose(window, true);
+    }
+
+    public void addKeyListener(IWindowKeyListener keyListener) {
+        keyDownListeners.add(keyListener);
+    }
+
+    public void removeKeyListener(IWindowKeyListener keyListener) {
+        keyDownListeners.remove(keyListener);
+    }
+
+    public void addSizeChangedListener(IWindowSizeListener sizeListener) {
+        sizeChangedListeners.add(sizeListener);
+    }
+
+    public void removeSizeChangedListener(IWindowSizeListener sizeListener) {
+        sizeChangedListeners.remove(sizeListener);
     }
 
     private void setUp() throws J3deException {
@@ -109,13 +121,8 @@ public abstract class Application {
         window = glfwCreateWindow(applicationOptions.getWidth(), applicationOptions.getHeight(),
                 applicationOptions.getTitle(), NULL, NULL);
         if (window == NULL) {
-            throw new WindowException("Cannot create window " + applicationOptions.getTitle(), null);
+            throw new WindowException("Cannot create window " + applicationOptions.getTitle(), 0L);
         }
-        // Setup a key callback. It will be called every time a key is pressed, repeated or released.
-        glfwSetKeyCallback(window, (window1, key, scancode, action, mods) -> {
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                glfwSetWindowShouldClose(window1, true); // We will detect this in the rendering start
-        });
 
         // Get the thread stack and push a new frame
         try (MemoryStack stack = stackPush()) {
@@ -151,8 +158,15 @@ public abstract class Application {
         // creates the GLCapabilities instance and makes the OpenGL
         // bindings available for use.
         GL.createCapabilities();
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        glClearDepth(1.);
+
+        // Setup a key callback. It will be called every time a key is pressed, repeated or released.
+        glfwSetKeyCallback(window, (window1, key1, scancode, action1, mods) -> {
+            var key = Key.fromValue(key1);
+            var keyActionType = KeyActionType.fromValue(action1);
+            for (var listener : keyDownListeners) {
+                listener.action(key, keyActionType);
+            }
+        });
 
         glfwSetWindowSizeCallback(window, (window1, w, h) -> {
             glViewport(0, 0, w, h);
@@ -160,7 +174,12 @@ public abstract class Application {
                 listener.change(w, h);
             }
         });
+
         initGame();
+
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClearDepth(1.);
+
         var previousFrameTime = glfwGetTime();
         while (!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

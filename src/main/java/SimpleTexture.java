@@ -12,6 +12,8 @@ import ch.zxseitz.j3de.graphics.scene.SceneGraph;
 import ch.zxseitz.j3de.math.Matrix4;
 import ch.zxseitz.j3de.graphics.scene.SceneObj;
 import ch.zxseitz.j3de.windows.ApplicationOptions;
+import ch.zxseitz.j3de.windows.Key;
+import ch.zxseitz.j3de.windows.KeyActionType;
 
 public class SimpleTexture extends Application {
     public static void main(String[] args) {
@@ -59,6 +61,13 @@ public class SimpleTexture extends Application {
         var mesh = factory.createRect2D(2f, 2f, Color.WHITE, texture);
         tex.setValue(texture.id);
         scene.getNodes().add(new SceneObj(mesh, Matrix4.createTranslation(0, 0, -5f)));
+
+        // keymap
+        addKeyListener((key, keyActionType) -> {
+            if (key == Key.ESC && keyActionType == KeyActionType.DOWN) {
+                close();
+            }
+        });
     }
 
     @Override

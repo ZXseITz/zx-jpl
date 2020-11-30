@@ -9,9 +9,11 @@ import ch.zxseitz.j3de.graphics.scene.SceneGraph;
 import ch.zxseitz.j3de.math.Matrix4;
 import ch.zxseitz.j3de.graphics.mesh.Mesh;
 import ch.zxseitz.j3de.graphics.scene.SceneObj;
-import ch.zxseitz.j3de.graphics.GraphicUtils;
+import ch.zxseitz.j3de.utils.GraphicUtils;
 import ch.zxseitz.j3de.utils.Tuple;
 import ch.zxseitz.j3de.windows.ApplicationOptions;
+import ch.zxseitz.j3de.windows.Key;
+import ch.zxseitz.j3de.windows.KeyActionType;
 
 import java.util.ArrayList;
 
@@ -50,7 +52,6 @@ public class SimpleTriangle extends Application {
 
         // scene
         scene = new SceneGraph(P, T);
-        getSizeChangedListeners().add(GraphicUtils.createResizeListenerStdOrtho(scene.getCamera()));
         var mesh = new Mesh(program);
         var vertices = new ArrayList<Tuple<ShaderAttribute, float[]>>(2);
         vertices.add(new Tuple<>(ShaderAttribute.POS, new float[] {
@@ -67,6 +68,14 @@ public class SimpleTriangle extends Application {
                 0, 1, 2
         }, PrimitiveType.TRIANGLES);
         scene.getNodes().add(new SceneObj(mesh, Matrix4.createTranslation(0, 0, -5f)));
+
+        // keymap
+        addKeyListener((key, keyActionType) -> {
+            if (key == Key.ESC && keyActionType == KeyActionType.DOWN) {
+                close();
+            }
+        });
+        addSizeChangedListener(GraphicUtils.createResizeListenerStdOrtho(scene.getCamera()));
     }
 
     @Override

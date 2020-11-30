@@ -1,12 +1,13 @@
-package ch.zxseitz.j3de.graphics;
+package ch.zxseitz.j3de.utils;
 
 import ch.zxseitz.j3de.math.Matrix4;
 import ch.zxseitz.j3de.graphics.scene.Camera;
+import ch.zxseitz.j3de.windows.IWindowSizeListener;
 
 public final class GraphicUtils {
     private GraphicUtils() {}
 
-    public static ISizeChanged createResizeListenerStdOrtho(Camera camera) {
+    public static IWindowSizeListener createResizeListenerStdOrtho(Camera camera) {
         return (width, height) -> {
             var aspect = (float) width / (float) height;
             if (aspect > 1f) {
