@@ -1,13 +1,10 @@
 package ch.zxseitz.j3de.graphics.programs;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import ch.zxseitz.j3de.exceptions.ShaderException;
+
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.lwjgl.opengl.GL45.*;
 
@@ -18,26 +15,24 @@ public class Shader {
         GEOMETRY_SHADER(GL_GEOMETRY_SHADER);
 
         int id;
-        Type(int id) {this.id = id; }
+
+        Type(int id) {
+            this.id = id;
+        }
     }
 
-    private int id;
-    private Type type;
+    private final int id;
+    private final Type type;
     private boolean deleted;
 
-    public Shader(Path path, Type type) {
-        try {
-            this.id = glCreateShader(type.id);
-            this.type = type;
-            this.deleted = false;
-            glShaderSource(id, loadShader(path));
-            glCompileShader(id);
-            if (glGetShaderi(id, GL_COMPILE_STATUS) == GL_FALSE)
-                throw new Exception("Error compiling shader\n" + glGetShaderInfoLog(id));
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
+    public Shader(Path path, Type type) throws ShaderException, IOException {
+        this.id = glCreateShader(type.id);
+        this.type = type;
+        this.deleted = false;
+        glShaderSource(id, loadShader(path));
+        glCompileShader(id);
+        if (glGetShaderi(id, GL_COMPILE_STATUS) == GL_FALSE)
+            throw new ShaderException("Error compiling shader\n" + glGetShaderInfoLog(id), this);
     }
 
     private String loadShader(Path path) throws IOException {
@@ -59,11 +54,11 @@ public class Shader {
         return type;
     }
 
-    public boolean isDeleted() {
+    public synchronized boolean isDeleted() {
         return deleted;
     }
 
-    public void destroy() {
+    public synchronized void destroy() {
         deleted = true;
         glDeleteShader(id);
     }

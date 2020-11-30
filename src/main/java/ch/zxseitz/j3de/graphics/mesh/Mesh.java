@@ -13,13 +13,13 @@ import java.util.Map;
 import static org.lwjgl.opengl.GL45.*;
 
 public class Mesh {
-    private int vao, ebo;
-    private Map<String, Integer> vbos;
+    private final int vao, ebo;
+    private final Map<String, Integer> vbos;
     private PrimitiveType mode;
     private int idxLength;
-    private boolean deleted;
+    private volatile boolean deleted;
 
-    private Program program;
+    private final Program program;
     private Texture tex;
 
     public Mesh(Program program) throws J3deException {
@@ -63,10 +63,6 @@ public class Mesh {
         return vbos.get(name);
     }
 
-    public boolean isDeleted() {
-        return deleted;
-    }
-
     public void setVertices(List<Tuple<ShaderAttribute, float[]>> vertices, int[] indices, PrimitiveType mode) {
         this.mode = mode;
             for (var attribute : vertices) {
@@ -86,7 +82,11 @@ public class Mesh {
         glDrawElements(mode.id, idxLength, GL_UNSIGNED_INT, 0);
     }
 
-    public void destroy() {
+    public synchronized boolean isDeleted() {
+        return deleted;
+    }
+
+    public synchronized void destroy() {
         deleted = true;
         glDeleteVertexArrays(vao);
         for (var id : vbos.values()) {

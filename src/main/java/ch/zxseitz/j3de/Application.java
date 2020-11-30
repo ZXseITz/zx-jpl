@@ -9,6 +9,7 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
+import java.io.IOException;
 import java.nio.IntBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -67,7 +68,7 @@ public abstract class Application {
      *
      * @throws J3deException
      */
-    protected abstract void initGame() throws J3deException;
+    protected abstract void initGame() throws J3deException, IOException;
 
     /**
      * Updates scene.
@@ -151,7 +152,7 @@ public abstract class Application {
         glfwShowWindow(window);
     }
 
-    private void run() throws J3deException {
+    private void run() throws J3deException, IOException {
         // This line is critical for LWJGL's interoperation with GLFW's
         // OpenGL context, or any context that is managed externally.
         // LWJGL detects the context that is current in the current thread,

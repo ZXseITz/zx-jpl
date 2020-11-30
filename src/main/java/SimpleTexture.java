@@ -14,6 +14,8 @@ import ch.zxseitz.j3de.windows.ApplicationOptions;
 import ch.zxseitz.j3de.windows.Key;
 import ch.zxseitz.j3de.windows.KeyActionType;
 
+import java.io.IOException;
+
 public class SimpleTexture extends Application {
     public static void main(String[] args) {
         launch(args);
@@ -28,7 +30,7 @@ public class SimpleTexture extends Application {
     }
 
     @Override
-    protected void initGame() throws J3deException {
+    protected void initGame() throws J3deException, IOException {
         // init program
         var vertexShader = new Shader(getClassResource( "shaders/vertexShaderTex.glsl"),
                 Shader.Type.VERTEX_SHADER);
