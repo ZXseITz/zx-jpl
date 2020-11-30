@@ -1,6 +1,7 @@
 package ch.zxseitz.j3de.graphics.scene;
 
-import ch.zxseitz.j3de.graphics.programs.uniforms.UniformMatrix4;
+import ch.zxseitz.j3de.exceptions.J3deException;
+import ch.zxseitz.j3de.graphics.programs.Program;
 import ch.zxseitz.j3de.math.Matrix4;
 
 import java.util.ArrayList;
@@ -8,20 +9,15 @@ import java.util.List;
 
 public class SceneGraph {
     private final List<SceneObj> nodes;
-    private final UniformMatrix4 uProjection;
-    private final UniformMatrix4 uTransformation;
     private Camera camera;
+    private Program program;
 
-    /**
-     * Constructor
-     * @param uProjection uniform projection matrix
-     * @param uTransformation uniform transformation matrix
-     */
-    public SceneGraph(UniformMatrix4 uProjection, UniformMatrix4 uTransformation) {
+    public SceneGraph(Program program) {
         this.nodes = new ArrayList<>(25);
-        this.uProjection = uProjection;
-        this.uTransformation = uTransformation;
         this.camera = Camera.DEFAULT_ORTHOGONAL;
+
+        //todo generalize
+        this.program = program;
     }
 
     public List<SceneObj> getNodes() {
@@ -39,18 +35,20 @@ public class SceneGraph {
     /**
      * Renders the entire scene graph
      */
-    public void render() {
-        this.uProjection.setValue(camera.getProjection());
+    public void render() throws J3deException {
+        //todo generalize
+        program.writeUniform("P", camera.getProjection());
         for (SceneObj node : nodes) {
             render(camera.getTransformation(), node);
         }
     }
 
-    private void render(Matrix4 transform, SceneObj node) {
+    private void render(Matrix4 transform, SceneObj node) throws J3deException {
         var t = transform.multiply(node.getTransformation());
         var mesh = node.getMesh();
         if (mesh != null) {
-            this.uTransformation.setValue(t);
+            //todo generalize
+            program.writeUniform("T", t);
             mesh.getProgram().use();
             mesh.render();
         }

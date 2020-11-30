@@ -1,5 +1,6 @@
 package ch.zxseitz.j3de.graphics.mesh;
 
+import ch.zxseitz.j3de.exceptions.J3deException;
 import ch.zxseitz.j3de.graphics.Texture;
 import ch.zxseitz.j3de.graphics.programs.Program;
 import ch.zxseitz.j3de.graphics.programs.ShaderAttribute;
@@ -21,7 +22,7 @@ public class Mesh {
     private Program program;
     private Texture tex;
 
-    public Mesh(Program program) {
+    public Mesh(Program program) throws J3deException {
         this.program = program;
         this.vao = glGenVertexArrays();
         glBindVertexArray(this.vao);

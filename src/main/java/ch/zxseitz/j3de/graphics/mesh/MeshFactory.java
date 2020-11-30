@@ -1,5 +1,6 @@
 package ch.zxseitz.j3de.graphics.mesh;
 
+import ch.zxseitz.j3de.exceptions.J3deException;
 import ch.zxseitz.j3de.graphics.Color;
 import ch.zxseitz.j3de.graphics.Texture;
 import ch.zxseitz.j3de.graphics.programs.Program;
@@ -10,8 +11,8 @@ import java.nio.FloatBuffer;
 import java.util.*;
 
 public class MeshFactory {
-    private static Set<ShaderAttribute> attributeSet;
-    private static Map<Integer, MeshFactory> factoryMap;
+    private static final Set<ShaderAttribute> attributeSet;
+    private static final Map<Integer, MeshFactory> factoryMap;
     public static MeshFactory getFactory(Program program) {
         var pid = program.getId();
         if (!factoryMap.containsKey(pid)) {
@@ -52,16 +53,16 @@ public class MeshFactory {
         }, count);
     }
 
-    private Program program;
+    private final Program program;
     private MeshFactory(Program program) {
         this.program = program;
     }
 
     // 2D Factory
-    public Mesh createRect2D(float width, float height, Color color) {
+    public Mesh createRect2D(float width, float height, Color color) throws J3deException {
         return createRect2D(width, height, color, null);
     }
-    public Mesh createRect2D(float width, float height, Color color, Texture texture) {
+    public Mesh createRect2D(float width, float height, Color color, Texture texture) throws J3deException {
         var mesh = new Mesh(program);
         var vertices = new ArrayList<Tuple<ShaderAttribute, float[]>>(4);
         var mode = PrimitiveType.TRIANGLE_FAN;

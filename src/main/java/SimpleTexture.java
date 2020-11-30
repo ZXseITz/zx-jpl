@@ -6,8 +6,6 @@ import ch.zxseitz.j3de.graphics.mesh.MeshFactory;
 import ch.zxseitz.j3de.graphics.programs.Program;
 import ch.zxseitz.j3de.graphics.programs.Shader;
 import ch.zxseitz.j3de.graphics.programs.ShaderAttribute;
-import ch.zxseitz.j3de.graphics.programs.uniforms.UniformInt;
-import ch.zxseitz.j3de.graphics.programs.uniforms.UniformMatrix4;
 import ch.zxseitz.j3de.graphics.scene.SceneGraph;
 import ch.zxseitz.j3de.math.Matrix4;
 import ch.zxseitz.j3de.graphics.scene.SceneObj;
@@ -45,21 +43,13 @@ public class SimpleTexture extends Application {
         vertexShader.destroy();
         fragmentShader.destroy();
 
-        // init uniforms
-        var P = new UniformMatrix4("P");
-        var T = new UniformMatrix4("T");
-        var tex = new UniformInt("tex");
-        program.getUniforms().add(P);
-        program.getUniforms().add(T);
-        program.getUniforms().add(tex);
-
         //scene
-        scene = new SceneGraph(P, T);
+        scene = new SceneGraph(program);
         var factory = MeshFactory.getFactory(program);
         assert factory != null;
         var texture = new Texture(getClassResource("textures/freebies.jpg"));
         var mesh = factory.createRect2D(2f, 2f, Color.WHITE, texture);
-        tex.setValue(texture.id);
+        program.writeUniform("tex", texture.id);
         scene.getNodes().add(new SceneObj(mesh, Matrix4.createTranslation(0, 0, -5f)));
 
         // keymap
@@ -71,7 +61,7 @@ public class SimpleTexture extends Application {
     }
 
     @Override
-    protected void updateGame(double delta) {
+    protected void updateGame(double delta) throws J3deException {
         scene.render();
     }
 }

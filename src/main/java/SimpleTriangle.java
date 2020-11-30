@@ -4,7 +4,6 @@ import ch.zxseitz.j3de.graphics.mesh.PrimitiveType;
 import ch.zxseitz.j3de.graphics.programs.Program;
 import ch.zxseitz.j3de.graphics.programs.Shader;
 import ch.zxseitz.j3de.graphics.programs.ShaderAttribute;
-import ch.zxseitz.j3de.graphics.programs.uniforms.UniformMatrix4;
 import ch.zxseitz.j3de.graphics.scene.SceneGraph;
 import ch.zxseitz.j3de.math.Matrix4;
 import ch.zxseitz.j3de.graphics.mesh.Mesh;
@@ -44,14 +43,8 @@ public class SimpleTriangle extends Application {
         vertexShader.destroy();
         fragmentShader.destroy();
 
-        // init uniforms
-        var P = new UniformMatrix4("P");
-        var T = new UniformMatrix4("T");
-        program.getUniforms().add(P);
-        program.getUniforms().add(T);
-
         // scene
-        scene = new SceneGraph(P, T);
+        scene = new SceneGraph(program);
         var mesh = new Mesh(program);
         var vertices = new ArrayList<Tuple<ShaderAttribute, float[]>>(2);
         vertices.add(new Tuple<>(ShaderAttribute.POS, new float[] {
@@ -79,7 +72,7 @@ public class SimpleTriangle extends Application {
     }
 
     @Override
-    protected void updateGame(double delta) {
+    protected void updateGame(double delta) throws J3deException {
         scene.render();
     }
 }
