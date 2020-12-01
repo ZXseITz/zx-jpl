@@ -1,97 +1,65 @@
 package ch.zxseitz.j3de.graphics.mesh;
 
-import ch.zxseitz.j3de.exceptions.J3deException;
+
+import ch.zxseitz.j3de.exceptions.BufferException;
 import ch.zxseitz.j3de.graphics.Texture;
 import ch.zxseitz.j3de.graphics.programs.Program;
-import ch.zxseitz.j3de.graphics.programs.ShaderAttribute;
-import ch.zxseitz.j3de.utils.Tuple;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import ch.zxseitz.j3de.utils.ErrorUtils;
 
 import static org.lwjgl.opengl.GL45.*;
 
 public class Mesh {
-    private final int vao, ebo;
-    private final Map<String, Integer> vbos;
-    private PrimitiveType mode;
-    private int idxLength;
-    private volatile boolean deleted;
+    private final VertexBuffer buffer;
+    private final int start, end;
+    private final int vertexStart;
+    private final PrimitiveType mode;
+    private Texture texture;
+    //todo texture
 
-    private final Program program;
-    private Texture tex;
-
-    public Mesh(Program program) throws J3deException {
-        this.program = program;
-        this.vao = glGenVertexArrays();
-        glBindVertexArray(this.vao);
-        this.vbos = new HashMap<>(4);
-        for(var sh : program.getAttributes()) {
-            var id = glGenBuffers();
-            var location = program.getAttribLocation(sh.name);
-            glBindBuffer(GL_ARRAY_BUFFER, id);
-            glEnableVertexAttribArray(location);
-            glVertexAttribPointer(location, sh.size, GL_FLOAT, false, 0, 0);
-            vbos.put(sh.name, id);
-        }
-        this.ebo = glGenBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    Mesh(VertexBuffer buffer, int start, int end, int vertexStart, PrimitiveType mode) {
+        this.buffer = buffer;
+        this.start = start;
+        this.end = end;
+        this.vertexStart = vertexStart;
+        this.mode = mode;
     }
 
     public Program getProgram() {
-        return program;
+        return buffer.getProgram();
     }
 
-    public Texture getTex() {
-        return tex;
+    public PrimitiveType getMode() {
+        return mode;
     }
 
-    public void setTex(Texture tex) {
-        this.tex = tex;
+    public int getStart() {
+        return start;
     }
 
-    public int getVao() {
-        return vao;
+    public int getEnd() {
+        return end;
     }
 
-    public int getEbo() {
-        return ebo;
+    public int count() {
+        return end - start + 1;
     }
 
-    public int getVbo(String name) {
-        return vbos.get(name);
+    public Texture getTexture() {
+        return texture;
     }
 
-    public void setVertices(List<Tuple<ShaderAttribute, float[]>> vertices, int[] indices, PrimitiveType mode) {
-        this.mode = mode;
-            for (var attribute : vertices) {
-                var id = vbos.get(attribute.getFirst().name);
-                var data = attribute.getSecond();
-                glBindBuffer(GL_ARRAY_BUFFER, id);
-                glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
-            }
-        idxLength = indices.length;
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
+    public void setTexture(Texture texture) {
+        this.texture = texture;
     }
 
-    public void render() {
-        glBindVertexArray(vao);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glDrawElements(mode.id, idxLength, GL_UNSIGNED_INT, 0);
-    }
+    public void render() throws BufferException {
+        glBindVertexArray(buffer.getVaoId());
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.getEboId());
+        glDrawRangeElementsBaseVertex(mode.id, start, end, count(), GL_UNSIGNED_INT, 0, vertexStart);
 
-    public synchronized boolean isDeleted() {
-        return deleted;
-    }
-
-    public synchronized void destroy() {
-        deleted = true;
-        glDeleteVertexArrays(vao);
-        for (var id : vbos.values()) {
-            glDeleteBuffers(id);
+        var error = glGetError();
+        if (error != GL_NO_ERROR) {
+            throw new BufferException(ErrorUtils.getErrorInfo(error), buffer);
         }
-        glDeleteBuffers(ebo);
     }
 }

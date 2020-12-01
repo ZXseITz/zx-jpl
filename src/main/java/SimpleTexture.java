@@ -3,6 +3,7 @@ import ch.zxseitz.j3de.exceptions.J3deException;
 import ch.zxseitz.j3de.graphics.Color;
 import ch.zxseitz.j3de.graphics.Texture;
 import ch.zxseitz.j3de.graphics.mesh.MeshFactory;
+import ch.zxseitz.j3de.graphics.mesh.VertexBuffer;
 import ch.zxseitz.j3de.graphics.programs.Program;
 import ch.zxseitz.j3de.graphics.programs.Shader;
 import ch.zxseitz.j3de.graphics.programs.ShaderAttribute;
@@ -22,7 +23,6 @@ public class SimpleTexture extends Application {
     }
 
     private Scene scene;
-    private Texture texture;
 
     @Override
     protected ApplicationOptions applicationInit() {
@@ -49,9 +49,10 @@ public class SimpleTexture extends Application {
 
         //scene
         scene = new Scene(program);
-        var factory = MeshFactory.getFactory(program);
+        var buffer = new VertexBuffer(program);
+        var factory = MeshFactory.getFactory(buffer);
         assert factory != null;
-        texture = new Texture(getClassResource("textures/freebies.jpg"));
+        var texture = new Texture(getClassResource("textures/freebies.jpg"));
         var mesh = factory.createRect2D(2f, 2f, Color.WHITE, texture);
         var component = new MeshComponent(mesh);
         var actor = new Actor(scene, Matrix4.createTranslation(0, 0, -5f));
@@ -68,8 +69,6 @@ public class SimpleTexture extends Application {
 
     @Override
     protected void updateGame(double delta) throws J3deException {
-        //todo move texture to mesh component
-        scene.getProgram().writeUniform("tex", texture.id);
         scene.update(delta);
     }
 }

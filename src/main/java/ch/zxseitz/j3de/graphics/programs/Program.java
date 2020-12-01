@@ -98,10 +98,26 @@ public class Program {
     }
 
     @Override
+    public int hashCode() {
+        return this.id;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof Program) {
             return id == ((Program) obj).id;
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("(").append(id).append(", (").append(attributes.get(0));
+        for (var i = 1; i < attributes.size(); i++) {
+            sb.append(",").append(attributes.get(i));
+        }
+        sb.append("))");
+        return sb.toString();
     }
 }

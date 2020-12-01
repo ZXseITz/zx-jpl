@@ -15,12 +15,16 @@ public class MeshComponent implements IComponent {
     @Override
     public void update(double delta, Actor actor, Matrix4 t) throws J3deException {
         if (mesh != null) {
-            //todo generalize
             var program = mesh.getProgram();
             //todo implement scene program to reduce program switch
             program.use();
+            //todo generalize
             program.writeUniform("P", actor.getScene().getCamera().getProjection());
             program.writeUniform("T", t);
+            var texture = mesh.getTexture();
+            if (texture != null) {
+                program.writeUniform("tex", texture.id);
+            }
             mesh.render();
         }
     }

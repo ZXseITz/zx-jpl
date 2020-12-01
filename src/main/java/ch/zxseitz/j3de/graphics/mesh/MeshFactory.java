@@ -12,17 +12,19 @@ import java.util.*;
 
 public class MeshFactory {
     private static final Set<ShaderAttribute> attributeSet;
-    private static final Map<Integer, MeshFactory> factoryMap;
-    public static MeshFactory getFactory(Program program) {
-        var pid = program.getId();
-        if (!factoryMap.containsKey(pid)) {
+    private static final Map<Program, MeshFactory> factoryMap;
+
+    public static MeshFactory getFactory(VertexBuffer buffer) {
+        var program = buffer.getProgram();
+        if (!factoryMap.containsKey(buffer.getProgram())) {
             for (var attribute : program.getAttributes()) {
                 if (!attributeSet.contains(attribute)) return null;
             }
-            factoryMap.put(pid, new MeshFactory(program));
+            factoryMap.put(program, new MeshFactory(buffer));
         }
-        return factoryMap.get(pid);
+        return factoryMap.get(program);
     }
+
     static {
         attributeSet = new HashSet<>(4);
         attributeSet.add(ShaderAttribute.POS);
@@ -53,17 +55,19 @@ public class MeshFactory {
         }, count);
     }
 
-    private final Program program;
-    private MeshFactory(Program program) {
-        this.program = program;
+    private final VertexBuffer buffer;
+
+    private MeshFactory(VertexBuffer buffer) {
+        this.buffer = buffer;
     }
 
     // 2D Factory
     public Mesh createRect2D(float width, float height, Color color) throws J3deException {
         return createRect2D(width, height, color, null);
     }
+
     public Mesh createRect2D(float width, float height, Color color, Texture texture) throws J3deException {
-        var mesh = new Mesh(program);
+        var program = buffer.getProgram();
         var vertices = new ArrayList<Tuple<ShaderAttribute, float[]>>(4);
         var mode = PrimitiveType.TRIANGLE_FAN;
         var indices = new int[]{
@@ -79,12 +83,11 @@ public class MeshFactory {
                     x, y, 0f,
                     -x, y, 0f,
             }));
-        if(attributes.contains(ShaderAttribute.NORMAL))
+        if (attributes.contains(ShaderAttribute.NORMAL))
             vertices.add(new Tuple<>(ShaderAttribute.NORMAL, createNormalArray(4)));
-        if(color != null && attributes.contains(ShaderAttribute.COLOR))
+        if (color != null && attributes.contains(ShaderAttribute.COLOR))
             vertices.add(new Tuple<>(ShaderAttribute.COLOR, createColorArray(color, 4)));
         if (texture != null && attributes.contains(ShaderAttribute.UV)) {
-            mesh.setTex(texture);
             vertices.add(new Tuple<>(ShaderAttribute.UV, new float[]{
                     0f, 0f,
                     0f, 1f,
@@ -92,7 +95,8 @@ public class MeshFactory {
                     1f, 0f,
             }));
         }
-        mesh.setVertices(vertices, indices, mode);
+        var mesh = buffer.createMesh(vertices, indices, mode);
+        mesh.setTexture(texture);
         return mesh;
     }
 
