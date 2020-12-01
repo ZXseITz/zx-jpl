@@ -41,6 +41,11 @@ public class VertexBuffer {
         this.ebo = glGenBuffers();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, INDEX_SIZE * 4L, GL_STATIC_DRAW);
+
+        var error = glGetError();
+        if (error != GL_NO_ERROR) {
+            throw new BufferException(ErrorUtils.getErrorInfo(error), this);
+        }
     }
 
     public Program getProgram() {
