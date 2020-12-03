@@ -35,12 +35,12 @@ public class VertexBuffer {
             glBindBuffer(GL_ARRAY_BUFFER, id);
             glEnableVertexAttribArray(location);
             glVertexAttribPointer(location, sh.size, GL_FLOAT, false, 0, 0);
-            glBufferData(GL_ARRAY_BUFFER, VERTEX_SIZE * sh.size * 4L, GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, VERTEX_SIZE * sh.size * 4L, GL_STREAM_DRAW);
             vbos.put(sh.name, id);
         }
         this.ebo = glGenBuffers();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, INDEX_SIZE * 4L, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, INDEX_SIZE * 4L, GL_STREAM_DRAW);
 
         var error = glGetError();
         if (error != GL_NO_ERROR) {
@@ -77,7 +77,7 @@ public class VertexBuffer {
                 throw new IllegalArgumentException("Vertices length is not equal for all attributes");
             }
             glBindBuffer(GL_ARRAY_BUFFER, id);
-            glBufferSubData(GL_ARRAY_BUFFER, vertexPointer * 4L, data);
+            glBufferSubData(GL_ARRAY_BUFFER, vertexPointer * attribute.size * 4L, data);
         }
         // register indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
