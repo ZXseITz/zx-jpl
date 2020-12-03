@@ -50,6 +50,10 @@ public class Program {
         return attributes;
     }
 
+    public int getAttributeSize() {
+        return attributes.stream().map(attribute -> attribute.size).reduce(Integer::sum).get();
+    }
+
     public void use() {
         glUseProgram(this.id);
     }

@@ -64,6 +64,42 @@ public class VertexBuffer {
         return ebo;
     }
 
+    public synchronized Mesh createMesh(float[] vertices, int[] indices,
+                                        PrimitiveType mode) throws BufferException {
+        // todo use c++ matrix to extract columns?
+        var combinedAttributeSize = program.getAttributeSize();
+        var n = vertices.length / combinedAttributeSize;
+        // register attributes
+        var offset = 0;
+        for (var attribute : program.getAttributes()) {
+            var cache = new float[n * attribute.size];
+            var id = vbos.get(attribute.name);
+            var k = 0;
+            for (var i = 0; i < n; i++) {
+                for (var j = 0; j < attribute.size; j++) {
+                    cache[k++] = vertices[i * combinedAttributeSize + offset + j];
+                }
+            }
+            offset += attribute.size;
+            glBindBuffer(GL_ARRAY_BUFFER, id);
+            glBufferSubData(GL_ARRAY_BUFFER, vertexPointer * attribute.size * 4L, cache);
+        }
+        // register indices
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, indexPointer * 4L, indices);
+
+        var error = glGetError();
+        if (error != GL_NO_ERROR) {
+            throw new BufferException(ErrorUtils.getErrorInfo(error), this);
+        }
+
+        // create mesh with buffer reference
+        var mesh = new Mesh(this, indexPointer, indexPointer + indices.length - 1, vertexPointer, mode);
+        vertexPointer += n;
+        indexPointer += indices.length;
+        return mesh;
+    }
+
     public synchronized Mesh createMesh(Map<ShaderAttribute, float[]> vertices, int[] indices,
                                         PrimitiveType mode) throws BufferException {
         var iterator = vertices.entrySet().iterator();

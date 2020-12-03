@@ -70,18 +70,11 @@ public class SimpleTriangle extends Application {
         scene.getActors().add(actor);
 
         // second triangle
-        vertices.clear();
-        vertices.put(ShaderAttribute.POS, new float[] {
-                -0.9f, 0.9f, 0f,
-                -0.9f, 0.8f, 0f,
-                -0.8f, 0.9f, 0f
-        });
-        vertices.put(ShaderAttribute.COLOR, new float[] {
-                0f, 0f, 1f, 1f,
-                0f, 0f, 1f, 1f,
-                0f, 0f, 1f, 1f
-        });
-        component = new MeshComponent(buffer.createMesh(vertices, new int[] {
+        component = new MeshComponent(buffer.createMesh(new float[] {
+                -0.9f, 0.9f, 0f,   0f, 0f, 1f, 1f,
+                -0.9f, 0.8f, 0f,   0f, 0f, 1f, 1f,
+                -0.8f, 0.9f, 0f,   0f, 0f, 1f, 1f
+        }, new int[] {
                 0, 1, 2
         }, PrimitiveType.TRIANGLES));
         actor = new Actor(scene, Matrix4.createTranslation(0, 0, -5f));
