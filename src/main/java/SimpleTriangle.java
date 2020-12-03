@@ -7,7 +7,7 @@ import ch.zxseitz.j3de.graphics.programs.ShaderAttribute;
 import ch.zxseitz.j3de.graphics.scene.Scene;
 import ch.zxseitz.j3de.graphics.scene.components.MeshComponent;
 import ch.zxseitz.j3de.math.Matrix4;
-import ch.zxseitz.j3de.graphics.mesh.Mesh;
+import ch.zxseitz.j3de.graphics.mesh.VertexBuffer;
 import ch.zxseitz.j3de.graphics.scene.Actor;
 import ch.zxseitz.j3de.utils.GraphicUtils;
 import ch.zxseitz.j3de.utils.Tuple;
@@ -45,9 +45,11 @@ public class SimpleTriangle extends Application {
         vertexShader.destroy();
         fragmentShader.destroy();
 
-        // scene
+        // scene and buffer
         scene = new Scene(program);
-        var mesh = new Mesh(program);
+        var buffer = new VertexBuffer(program);
+
+        // first triangle
         var vertices = new ArrayList<Tuple<ShaderAttribute, float[]>>(2);
         vertices.add(new Tuple<>(ShaderAttribute.POS, new float[] {
                 -0.8f, -0.6f, 0f,
@@ -59,11 +61,29 @@ public class SimpleTriangle extends Application {
                 0f, 1f, 0f, 1f,
                 0f, 0f, 1f, 1f
         }));
-        mesh.setVertices(vertices, new int[] {
+        var component = new MeshComponent(buffer.createMesh(vertices, new int[] {
                 0, 1, 2
-        }, PrimitiveType.TRIANGLES);
-        var component = new MeshComponent(mesh);
+        }, PrimitiveType.TRIANGLES));
         var actor = new Actor(scene, Matrix4.createTranslation(0, 0, -5f));
+        actor.getComponents().add(component);
+        scene.getActors().add(actor);
+
+        // second triangle
+        vertices.clear();
+        vertices.add(new Tuple<>(ShaderAttribute.POS, new float[] {
+                -0.9f, 0.9f, 0f,
+                -0.9f, 0.8f, 0f,
+                -0.8f, 0.9f, 0f
+        }));
+        vertices.add(new Tuple<>(ShaderAttribute.COLOR, new float[] {
+                0f, 0f, 1f, 1f,
+                0f, 0f, 1f, 1f,
+                0f, 0f, 1f, 1f
+        }));
+        component = new MeshComponent(buffer.createMesh(vertices, new int[] {
+                0, 1, 2
+        }, PrimitiveType.TRIANGLES));
+        actor = new Actor(scene, Matrix4.createTranslation(0, 0, -5f));
         actor.getComponents().add(component);
         scene.getActors().add(actor);
 
