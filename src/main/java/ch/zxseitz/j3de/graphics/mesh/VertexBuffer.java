@@ -64,20 +64,28 @@ public class VertexBuffer {
         return ebo;
     }
 
-    public synchronized Mesh createMesh(List<Tuple<ShaderAttribute, float[]>> vertices, int[] indices,
+    public synchronized Mesh createMesh(Map<ShaderAttribute, float[]> vertices, int[] indices,
                                         PrimitiveType mode) throws BufferException {
-        var firstEntry = vertices.get(0);
-        var n = firstEntry.getSecond().length / firstEntry.getFirst().size;
-        // register vertices
-        for (var entry : vertices) {
-            var attribute = entry.getFirst();
-            var id = vbos.get(attribute.name);
-            var data = entry.getSecond();
-            if (data.length / attribute.size != n) {
+        var iterator = vertices.entrySet().iterator();
+        // register first attributes
+        var entry = iterator.next();
+        var attr = entry.getKey();
+        var data = entry.getValue();
+        var n = data.length / attr.size;
+        var id = vbos.get(attr.name);
+        glBindBuffer(GL_ARRAY_BUFFER, id);
+        glBufferSubData(GL_ARRAY_BUFFER, vertexPointer * attr.size * 4L, data);
+        // register remaining attributes
+        while (iterator.hasNext()) {
+            entry = iterator.next();
+            attr = entry.getKey();
+            data = entry.getValue();
+            if (data.length / attr.size != n) {
                 throw new IllegalArgumentException("Vertices length is not equal for all attributes");
             }
+            id = vbos.get(attr.name);
             glBindBuffer(GL_ARRAY_BUFFER, id);
-            glBufferSubData(GL_ARRAY_BUFFER, vertexPointer * attribute.size * 4L, data);
+            glBufferSubData(GL_ARRAY_BUFFER, vertexPointer * attr.size * 4L, data);
         }
         // register indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);

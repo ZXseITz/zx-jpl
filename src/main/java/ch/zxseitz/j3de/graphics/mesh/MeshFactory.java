@@ -68,7 +68,7 @@ public class MeshFactory {
 
     public Mesh createRect2D(float width, float height, Color color, Texture texture) throws J3deException {
         var program = buffer.getProgram();
-        var vertices = new ArrayList<Tuple<ShaderAttribute, float[]>>(4);
+        var vertices = new HashMap<ShaderAttribute, float[]>(4);
         var mode = PrimitiveType.TRIANGLE_FAN;
         var indices = new int[]{
                 0, 1, 2, 3
@@ -77,23 +77,23 @@ public class MeshFactory {
         var y = height / 2;
         var attributes = program.getAttributes();
         if (attributes.contains(ShaderAttribute.POS))
-            vertices.add(new Tuple<>(ShaderAttribute.POS, new float[]{
+            vertices.put(ShaderAttribute.POS, new float[]{
                     -x, -y, 0f,
                     x, -y, 0f,
                     x, y, 0f,
                     -x, y, 0f,
-            }));
+            });
         if (attributes.contains(ShaderAttribute.NORMAL))
-            vertices.add(new Tuple<>(ShaderAttribute.NORMAL, createNormalArray(4)));
+            vertices.put(ShaderAttribute.NORMAL, createNormalArray(4));
         if (color != null && attributes.contains(ShaderAttribute.COLOR))
-            vertices.add(new Tuple<>(ShaderAttribute.COLOR, createColorArray(color, 4)));
+            vertices.put(ShaderAttribute.COLOR, createColorArray(color, 4));
         if (texture != null && attributes.contains(ShaderAttribute.UV)) {
-            vertices.add(new Tuple<>(ShaderAttribute.UV, new float[]{
+            vertices.put(ShaderAttribute.UV, new float[]{
                     0f, 0f,
                     0f, 1f,
                     1f, 1f,
                     1f, 0f,
-            }));
+            });
         }
         var mesh = buffer.createMesh(vertices, indices, mode);
         mesh.setTexture(texture);

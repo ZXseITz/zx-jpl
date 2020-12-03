@@ -17,6 +17,7 @@ import ch.zxseitz.j3de.window.KeyActionType;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class SimpleTriangle extends Application {
     public static void main(String[] args) {
@@ -50,17 +51,17 @@ public class SimpleTriangle extends Application {
         var buffer = new VertexBuffer(program);
 
         // first triangle
-        var vertices = new ArrayList<Tuple<ShaderAttribute, float[]>>(2);
-        vertices.add(new Tuple<>(ShaderAttribute.POS, new float[] {
+        var vertices = new HashMap<ShaderAttribute, float[]>(2);
+        vertices.put(ShaderAttribute.POS, new float[] {
                 -0.8f, -0.6f, 0f,
                 0.8f, -0.6f, 0f,
                 0f, 0.6f, 0f
-        }));
-        vertices.add(new Tuple<>(ShaderAttribute.COLOR, new float[] {
+        });
+        vertices.put(ShaderAttribute.COLOR, new float[] {
                 1f, 0f, 0f, 1f,
                 0f, 1f, 0f, 1f,
                 0f, 0f, 1f, 1f
-        }));
+        });
         var component = new MeshComponent(buffer.createMesh(vertices, new int[] {
                 0, 1, 2
         }, PrimitiveType.TRIANGLES));
@@ -70,16 +71,16 @@ public class SimpleTriangle extends Application {
 
         // second triangle
         vertices.clear();
-        vertices.add(new Tuple<>(ShaderAttribute.POS, new float[] {
+        vertices.put(ShaderAttribute.POS, new float[] {
                 -0.9f, 0.9f, 0f,
                 -0.9f, 0.8f, 0f,
                 -0.8f, 0.9f, 0f
-        }));
-        vertices.add(new Tuple<>(ShaderAttribute.COLOR, new float[] {
+        });
+        vertices.put(ShaderAttribute.COLOR, new float[] {
                 0f, 0f, 1f, 1f,
                 0f, 0f, 1f, 1f,
                 0f, 0f, 1f, 1f
-        }));
+        });
         component = new MeshComponent(buffer.createMesh(vertices, new int[] {
                 0, 1, 2
         }, PrimitiveType.TRIANGLES));
