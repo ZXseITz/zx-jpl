@@ -1,22 +1,20 @@
 import ch.zxseitz.j3de.Application;
 import ch.zxseitz.j3de.exceptions.J3deException;
-import ch.zxseitz.j3de.graphics.mesh.PrimitiveType;
-import ch.zxseitz.j3de.graphics.programs.Program;
-import ch.zxseitz.j3de.graphics.programs.Shader;
-import ch.zxseitz.j3de.graphics.programs.ShaderAttribute;
+import ch.zxseitz.j3de.graphics.core.PrimitiveType;
+import ch.zxseitz.j3de.graphics.core.Program;
+import ch.zxseitz.j3de.graphics.core.Shader;
+import ch.zxseitz.j3de.graphics.core.ShaderAttribute;
+import ch.zxseitz.j3de.graphics.mesh.MeshFactory;
 import ch.zxseitz.j3de.graphics.scene.Scene;
 import ch.zxseitz.j3de.graphics.scene.components.MeshComponent;
 import ch.zxseitz.j3de.math.Matrix4;
-import ch.zxseitz.j3de.graphics.mesh.VertexBuffer;
 import ch.zxseitz.j3de.graphics.scene.Actor;
 import ch.zxseitz.j3de.utils.GraphicUtils;
-import ch.zxseitz.j3de.utils.Tuple;
 import ch.zxseitz.j3de.window.ApplicationOptions;
 import ch.zxseitz.j3de.window.Key;
 import ch.zxseitz.j3de.window.KeyActionType;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SimpleTriangle extends Application {
@@ -48,9 +46,9 @@ public class SimpleTriangle extends Application {
 
         // scene and buffer
         scene = new Scene(program);
-        var buffer = new VertexBuffer(program);
 
         // first triangle
+        var factory = new MeshFactory(program);
         var vertices = new HashMap<ShaderAttribute, float[]>(2);
         vertices.put(ShaderAttribute.POS, new float[] {
                 -0.8f, -0.6f, 0f,
@@ -62,7 +60,7 @@ public class SimpleTriangle extends Application {
                 0f, 1f, 0f, 1f,
                 0f, 0f, 1f, 1f
         });
-        var component = new MeshComponent(buffer.createMesh(vertices, new int[] {
+        var component = new MeshComponent(factory.create(vertices, new int[] {
                 0, 1, 2
         }, PrimitiveType.TRIANGLES));
         var actor = new Actor(scene, Matrix4.createTranslation(0, 0, -5f));
@@ -70,7 +68,7 @@ public class SimpleTriangle extends Application {
         scene.getActors().add(actor);
 
         // second triangle
-        component = new MeshComponent(buffer.createMesh(new float[] {
+        component = new MeshComponent(factory.create(new float[] {
                 -0.9f, 0.9f, 0f,   0f, 0f, 1f, 1f,
                 -0.9f, 0.8f, 0f,   0f, 0f, 1f, 1f,
                 -0.8f, 0.9f, 0f,   0f, 0f, 1f, 1f

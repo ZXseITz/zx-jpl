@@ -1,23 +1,23 @@
 package ch.zxseitz.j3de.graphics.mesh;
 
 
-import ch.zxseitz.j3de.exceptions.BufferException;
 import ch.zxseitz.j3de.graphics.Texture;
-import ch.zxseitz.j3de.graphics.programs.Program;
-import ch.zxseitz.j3de.utils.ErrorUtils;
-
-import static org.lwjgl.opengl.GL45.*;
+import ch.zxseitz.j3de.graphics.core.PrimitiveType;
+import ch.zxseitz.j3de.graphics.core.Program;
 
 public class Mesh {
-    private final VertexBuffer buffer;
+    private final Program program;
+    private final int vao, ebo;
     private final int start, end;
     private final int vertexStart;
     private final PrimitiveType mode;
     private Texture texture;
     //todo texture
 
-    Mesh(VertexBuffer buffer, int start, int end, int vertexStart, PrimitiveType mode) {
-        this.buffer = buffer;
+    Mesh(Program program, int vao, int ebo, int start, int end, int vertexStart, PrimitiveType mode) {
+        this.program = program;
+        this.vao = vao;
+        this.ebo = ebo;
         this.start = start;
         this.end = end;
         this.vertexStart = vertexStart;
@@ -25,7 +25,15 @@ public class Mesh {
     }
 
     public Program getProgram() {
-        return buffer.getProgram();
+        return program;
+    }
+
+    public int getVao() {
+        return vao;
+    }
+
+    public int getEbo() {
+        return ebo;
     }
 
     public PrimitiveType getMode() {
@@ -44,22 +52,15 @@ public class Mesh {
         return end - start + 1;
     }
 
+    public int getVertexStart() {
+        return vertexStart;
+    }
+
     public Texture getTexture() {
         return texture;
     }
 
     public void setTexture(Texture texture) {
         this.texture = texture;
-    }
-
-    public void render() throws BufferException {
-        glBindVertexArray(buffer.getVaoId());
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.getEboId());
-        glDrawRangeElementsBaseVertex(mode.id, start, end, count(), GL_UNSIGNED_INT, 0, vertexStart);
-
-        var error = glGetError();
-        if (error != GL_NO_ERROR) {
-            throw new BufferException(ErrorUtils.getErrorInfo(error), buffer);
-        }
     }
 }

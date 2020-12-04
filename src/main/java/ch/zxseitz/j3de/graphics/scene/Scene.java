@@ -1,7 +1,7 @@
 package ch.zxseitz.j3de.graphics.scene;
 
 import ch.zxseitz.j3de.exceptions.J3deException;
-import ch.zxseitz.j3de.graphics.programs.Program;
+import ch.zxseitz.j3de.graphics.core.Program;
 import ch.zxseitz.j3de.math.Matrix4;
 
 import java.util.ArrayList;

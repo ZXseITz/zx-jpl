@@ -1,4 +1,4 @@
-package ch.zxseitz.j3de.graphics.programs;
+package ch.zxseitz.j3de.graphics.core;
 
 import ch.zxseitz.j3de.exceptions.ShaderException;
 

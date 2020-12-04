@@ -1,4 +1,4 @@
-package ch.zxseitz.j3de.graphics.mesh;
+package ch.zxseitz.j3de.graphics.core;
 
 import static org.lwjgl.opengl.GL45.*;
 

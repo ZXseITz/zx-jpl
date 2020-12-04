@@ -47,7 +47,7 @@ public class Color {
     }
 
     private static float clamp(float value) {
-        return value < 0f ? 0f : value > 1f ? 1f : value;
+        return value < 0f ? 0f : Math.min(value, 1f);
     }
 
     //todo arithmetic handle alpha channel correctly

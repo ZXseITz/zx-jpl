@@ -4,6 +4,13 @@ import ch.zxseitz.j3de.exceptions.J3deException;
 import ch.zxseitz.j3de.graphics.mesh.Mesh;
 import ch.zxseitz.j3de.graphics.scene.Actor;
 import ch.zxseitz.j3de.math.Matrix4;
+import ch.zxseitz.j3de.utils.ErrorUtils;
+
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL32.glDrawRangeElementsBaseVertex;
 
 public class MeshComponent implements IComponent {
     private Mesh mesh;
@@ -25,7 +32,17 @@ public class MeshComponent implements IComponent {
             if (texture != null) {
                 program.writeUniform("tex", texture.id);
             }
-            mesh.render();
+
+            // render mesh
+            glBindVertexArray(mesh.getVao());
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.getEbo());
+            glDrawRangeElementsBaseVertex( mesh.getMode().id, mesh.getStart(), mesh.getEnd(),
+                    mesh.count(), GL_UNSIGNED_INT, 0, mesh.getVertexStart());
+
+            var error = glGetError();
+            if (error != GL_NO_ERROR) {
+                throw new J3deException(ErrorUtils.getErrorInfo(error));
+            }
         }
     }
 }

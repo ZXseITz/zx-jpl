@@ -1,6 +1,6 @@
 package ch.zxseitz.j3de.exceptions;
 
-import ch.zxseitz.j3de.graphics.programs.Shader;
+import ch.zxseitz.j3de.graphics.core.Shader;
 
 public class ShaderException extends J3deException {
     private final Shader shader;

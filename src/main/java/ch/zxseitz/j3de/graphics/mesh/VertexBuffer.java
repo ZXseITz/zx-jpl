@@ -2,45 +2,43 @@ package ch.zxseitz.j3de.graphics.mesh;
 
 import ch.zxseitz.j3de.exceptions.BufferException;
 import ch.zxseitz.j3de.exceptions.J3deException;
-import ch.zxseitz.j3de.graphics.programs.Program;
-import ch.zxseitz.j3de.graphics.programs.ShaderAttribute;
+import ch.zxseitz.j3de.graphics.core.PrimitiveType;
+import ch.zxseitz.j3de.graphics.core.Program;
+import ch.zxseitz.j3de.graphics.core.ShaderAttribute;
 import ch.zxseitz.j3de.utils.ErrorUtils;
-import ch.zxseitz.j3de.utils.Tuple;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL45.*;
 
 public class VertexBuffer {
-    private static final long VERTEX_SIZE = 10000;
-    private static final long INDEX_SIZE = 100000;
-
     private final Program program;
+    private final int vertexSize, indexSize;
     private final int vao, ebo;
     private final Map<String, Integer> vbos;
+    private int vertexPointer, indexPointer;
+    private boolean deleted;
 
-    private volatile int vertexPointer, indexPointer;
-    private volatile boolean deleted;
-
-    public VertexBuffer(Program program) throws J3deException {
+    VertexBuffer(Program program, int vertexSize, int indexSize) throws J3deException {
         this.program = program;
+        this.vertexSize = vertexSize;
+        this.indexSize = indexSize;
         this.vao = glGenVertexArrays();
         glBindVertexArray(this.vao);
         this.vbos = new HashMap<>(4);
-        for (var sh : program.getAttributes()) {
+        for (var attribute : program.getAttributes()) {
             var id = glGenBuffers();
-            var location = program.getAttribLocation(sh.name);
+            var location = program.getAttribLocation(attribute.name);
             glBindBuffer(GL_ARRAY_BUFFER, id);
             glEnableVertexAttribArray(location);
-            glVertexAttribPointer(location, sh.size, GL_FLOAT, false, 0, 0);
-            glBufferData(GL_ARRAY_BUFFER, VERTEX_SIZE * sh.size * 4L, GL_STREAM_DRAW);
-            vbos.put(sh.name, id);
+            glVertexAttribPointer(location, attribute.size, GL_FLOAT, false, 0, 0);
+            glBufferData(GL_ARRAY_BUFFER, vertexSize * attribute.size * 4L, GL_STREAM_DRAW);
+            vbos.put(attribute.name, id);
         }
         this.ebo = glGenBuffers();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, INDEX_SIZE * 4L, GL_STREAM_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexSize * 4L, GL_STREAM_DRAW);
 
         var error = glGetError();
         if (error != GL_NO_ERROR) {
@@ -48,78 +46,21 @@ public class VertexBuffer {
         }
     }
 
-    public Program getProgram() {
-        return program;
+    public int countFreeVertices() {
+        return vertexSize - vertexPointer;
     }
 
-    public int getVaoId() {
-        return vao;
+    public int countFreeIndices() {
+        return indexSize - indexPointer;
     }
 
-    public int getVboId(String name) {
-        return vbos.get(name);
-    }
-
-    public int getEboId() {
-        return ebo;
-    }
-
-    public synchronized Mesh createMesh(float[] vertices, int[] indices,
-                                        PrimitiveType mode) throws BufferException {
-        // todo use c++ matrix to extract columns?
-        var combinedAttributeSize = program.getAttributeSize();
-        var n = vertices.length / combinedAttributeSize;
-        // register attributes
-        var offset = 0;
-        for (var attribute : program.getAttributes()) {
-            var cache = new float[n * attribute.size];
-            var id = vbos.get(attribute.name);
-            var k = 0;
-            for (var i = 0; i < n; i++) {
-                for (var j = 0; j < attribute.size; j++) {
-                    cache[k++] = vertices[i * combinedAttributeSize + offset + j];
-                }
-            }
-            offset += attribute.size;
-            glBindBuffer(GL_ARRAY_BUFFER, id);
-            glBufferSubData(GL_ARRAY_BUFFER, vertexPointer * attribute.size * 4L, cache);
-        }
-        // register indices
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, indexPointer * 4L, indices);
-
-        var error = glGetError();
-        if (error != GL_NO_ERROR) {
-            throw new BufferException(ErrorUtils.getErrorInfo(error), this);
-        }
-
-        // create mesh with buffer reference
-        var mesh = new Mesh(this, indexPointer, indexPointer + indices.length - 1, vertexPointer, mode);
-        vertexPointer += n;
-        indexPointer += indices.length;
-        return mesh;
-    }
-
-    public synchronized Mesh createMesh(Map<ShaderAttribute, float[]> vertices, int[] indices,
-                                        PrimitiveType mode) throws BufferException {
-        var iterator = vertices.entrySet().iterator();
-        // register first attributes
-        var entry = iterator.next();
-        var attr = entry.getKey();
-        var data = entry.getValue();
-        var n = data.length / attr.size;
-        var id = vbos.get(attr.name);
-        glBindBuffer(GL_ARRAY_BUFFER, id);
-        glBufferSubData(GL_ARRAY_BUFFER, vertexPointer * attr.size * 4L, data);
+    Mesh createMesh(Map<ShaderAttribute, float[]> vertices, int vertexLength, int[] indices,
+                    PrimitiveType mode) throws BufferException {
         // register remaining attributes
-        while (iterator.hasNext()) {
-            entry = iterator.next();
-            attr = entry.getKey();
-            data = entry.getValue();
-            if (data.length / attr.size != n) {
-                throw new IllegalArgumentException("Vertices length is not equal for all attributes");
-            }
-            id = vbos.get(attr.name);
+        for (Map.Entry<ShaderAttribute, float[]> entry : vertices.entrySet()) {
+            var attr = entry.getKey();
+            var data = entry.getValue();
+            var id = vbos.get(attr.name);
             glBindBuffer(GL_ARRAY_BUFFER, id);
             glBufferSubData(GL_ARRAY_BUFFER, vertexPointer * attr.size * 4L, data);
         }
@@ -133,17 +74,18 @@ public class VertexBuffer {
         }
 
         // create mesh with buffer reference
-        var mesh = new Mesh(this, indexPointer, indexPointer + indices.length - 1, vertexPointer, mode);
-        vertexPointer += n;
+        var mesh = new Mesh(program, vao, ebo, indexPointer, indexPointer + indices.length - 1,
+                vertexPointer, mode);
+        vertexPointer += vertexLength;
         indexPointer += indices.length;
         return mesh;
     }
 
-    public synchronized boolean isDeleted() {
+    boolean isDeleted() {
         return deleted;
     }
 
-    public synchronized void destroy() {
+    void destroy() {
         deleted = true;
         glDeleteVertexArrays(vao);
         for (var id : vbos.values()) {

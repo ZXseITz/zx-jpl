@@ -1,4 +1,6 @@
-package ch.zxseitz.j3de.graphics.programs;
+package ch.zxseitz.j3de.graphics.core;
+
+import java.util.Objects;
 
 public class ShaderAttribute {
     public static final ShaderAttribute POS = new ShaderAttribute("pos", 3);
@@ -8,18 +10,16 @@ public class ShaderAttribute {
 
     public final String name;
     public final int size;
-    private final int hash;
 
     public ShaderAttribute(String name, int size) {
         this.name = name;
         this.size = size;
-        this.hash = String.format("%s:%d", name, size).hashCode();
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof ShaderAttribute) {
-            var other = (ShaderAttribute) obj;
+    public boolean equals(Object o) {
+        if (o instanceof ShaderAttribute) {
+            var other = (ShaderAttribute) o;
             return name.equals(other.name) && size == other.size;
         }
         return false;
@@ -27,6 +27,11 @@ public class ShaderAttribute {
 
     @Override
     public int hashCode() {
-        return this.hash;
+        return Objects.hash(name, size);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s:%d", name, size);
     }
 }

@@ -1,4 +1,4 @@
-package ch.zxseitz.j3de.graphics.programs;
+package ch.zxseitz.j3de.graphics.core;
 
 import ch.zxseitz.j3de.exceptions.AttribException;
 import ch.zxseitz.j3de.exceptions.ProgramException;
@@ -20,8 +20,8 @@ public class Program {
     private final List<ShaderAttribute> attributes;
 
     public Program(Shader[] shaders, ShaderAttribute[] attributes) throws ProgramException {
-        this.shaders = Collections.unmodifiableList(List.of(shaders));
-        this.attributes = Collections.unmodifiableList(List.of(attributes));
+        this.shaders = List.of(shaders);
+        this.attributes = List.of(attributes);
         this.id = glCreateProgram();
         // attach shader
         for (var shader : shaders) {

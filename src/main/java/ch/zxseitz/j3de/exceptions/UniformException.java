@@ -1,6 +1,6 @@
 package ch.zxseitz.j3de.exceptions;
 
-import ch.zxseitz.j3de.graphics.programs.Program;
+import ch.zxseitz.j3de.graphics.core.Program;
 
 public class UniformException extends ProgramException {
     private final String name;
