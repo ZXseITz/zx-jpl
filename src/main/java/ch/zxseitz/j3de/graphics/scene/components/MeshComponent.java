@@ -6,11 +6,7 @@ import ch.zxseitz.j3de.graphics.scene.Actor;
 import ch.zxseitz.j3de.math.Matrix4;
 import ch.zxseitz.j3de.utils.ErrorUtils;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL32.glDrawRangeElementsBaseVertex;
+import static org.lwjgl.opengl.GL45.*;
 
 public class MeshComponent implements IComponent {
     private Mesh mesh;

@@ -1,12 +1,9 @@
 package ch.zxseitz.j3de.graphics.mesh;
 
 
-import ch.zxseitz.j3de.exceptions.BufferException;
 import ch.zxseitz.j3de.exceptions.J3deException;
 import ch.zxseitz.j3de.graphics.Color;
-import ch.zxseitz.j3de.graphics.Texture;
 import ch.zxseitz.j3de.graphics.core.*;
-import ch.zxseitz.j3de.math.Vector4;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -83,53 +80,25 @@ public class MeshFactory {
         return buffer;
     }
 
-    //todo outsource to separate factory
-    public static float[] createArray(float[] pattern, int count) {
-        var buffer = FloatBuffer.allocate(pattern.length * count);
-        for (int i = 0; i < count; i++) {
-            buffer.put(pattern);
+    private static final float[] normalPattern = new float[] {0f, 0f, 1f};
+
+    public static float[] createNormalArray(int vertexLength) {
+        var buffer = FloatBuffer.allocate(3 * vertexLength);
+        for (int i = 0; i < vertexLength; i++) {
+            buffer.put(normalPattern);
         }
         return buffer.flip().array();
     }
-    public static float[] createNormalArray(int count) {
-        return createArray(new float[]{0f, 0f, 1f}, count);
-    }
-    public static float[] createColorArray(Color color, int count) {
-        return createArray(new float[]{
-                color.r,
-                color.g,
-                color.b,
-                color.a
-        }, count);
-    }
-    public Mesh createRect2D(float width, float height, Color color, Texture texture) throws J3deException {
-        var attributes = program.getAttributes();
-        var vertices = new HashMap<ShaderAttribute, float[]>(4);
-        var x = width / 2;
-        var y = height / 2;
-        if (attributes.contains(ShaderAttribute.POS))
-            vertices.put(ShaderAttribute.POS, new float[]{
-                    -x, -y, 0f,
-                    x, -y, 0f,
-                    x, y, 0f,
-                    -x, y, 0f,
-            });
-        if(attributes.contains(ShaderAttribute.NORMAL))
-            vertices.put(ShaderAttribute.NORMAL, createNormalArray(4));
-        if(color != null && attributes.contains(ShaderAttribute.COLOR))
-            vertices.put(ShaderAttribute.COLOR, createColorArray(color, 4));
-        if (texture != null && attributes.contains(ShaderAttribute.UV)) {
-            vertices.put(ShaderAttribute.UV, new float[]{
-                    0f, 0f,
-                    0f, 1f,
-                    1f, 1f,
-                    1f, 0f,
-            });
+
+    // interpolate between multiple colors
+    public static float[] createColorArray(Color color, int vertexLength) {
+        var buffer = FloatBuffer.allocate(4 * vertexLength);
+        for (int i = 0; i < vertexLength; i++) {
+            buffer.put(color.r);
+            buffer.put(color.g);
+            buffer.put(color.b);
+            buffer.put(color.a);
         }
-        var mesh = getBuffer(4, 4).createMesh(vertices, 4, new int[] {
-                0, 1, 2, 3
-        }, PrimitiveType.TRIANGLE_FAN);
-        mesh.setTexture(texture);
-        return mesh;
+        return buffer.flip().array();
     }
 }
