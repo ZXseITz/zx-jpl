@@ -121,10 +121,9 @@ abstract class Application {
         }
 
         // Get the thread stack and push a new frame
-        val stack = stackPush()
-        try {
-            val pWidth = stack.mallocInt(1) // int*
-            val pHeight = stack.mallocInt(1) // int*
+        stackPush().use { stack1 ->
+            val pWidth = stack1.mallocInt(1) // int*
+            val pHeight = stack1.mallocInt(1) // int*
 
             // Get the window size passed to glfwCreateWindow
             glfwGetWindowSize(window, pWidth, pHeight)
@@ -140,8 +139,6 @@ abstract class Application {
                     (vidmode.height() - pHeight.get(0)) / 2
                 )
             }
-        } finally {
-            stack.close()
         }
 
         // Make the OpenGL context current
