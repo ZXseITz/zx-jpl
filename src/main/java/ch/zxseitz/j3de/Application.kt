@@ -10,6 +10,7 @@ import java.util.*
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL45.*
+import org.lwjgl.system.MemoryStack.stackPop
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.system.MemoryUtil.NULL
 import kotlin.collections.ArrayList
@@ -120,7 +121,8 @@ abstract class Application {
         }
 
         // Get the thread stack and push a new frame
-        stackPush().use { stack ->
+        val stack = stackPush()
+        try {
             val pWidth = stack.mallocInt(1) // int*
             val pHeight = stack.mallocInt(1) // int*
 
@@ -138,7 +140,9 @@ abstract class Application {
                     (vidmode.height() - pHeight.get(0)) / 2
                 )
             }
-        } // the stack frame is popped automatically
+        } finally {
+            stack.close()
+        }
 
         // Make the OpenGL context current
         glfwMakeContextCurrent(window)

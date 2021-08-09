@@ -1,7 +1,7 @@
 package ch.zxseitz.j3de.math;
 
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 
 class Matrix4Test {
     @Test
@@ -16,7 +16,7 @@ class Matrix4Test {
                 9f, 10f, 11f, 12f,
                 13f, 14f, 15f, 16f)
 
-        Assert.assertEquals(A, B)
+        assertEquals(A, B)
     }
 
     @Test
@@ -31,7 +31,7 @@ class Matrix4Test {
                 9f, 10f, 0f, 12f,
                 13f, 14f, 15f, 16f)
 
-        Assert.assertNotEquals(A, B);
+        assertNotEquals(A, B);
     }
 
     @Test
@@ -41,7 +41,7 @@ class Matrix4Test {
                 9f, 10f, 11f, 12f,
                 13f, 14f, 15f, 16f);
 
-        Assert.assertEquals("""
+        assertEquals("""
 [
   1.000, 2.000, 3.000, 4.000
   5.000, 6.000, 7.000, 8.000
@@ -67,7 +67,7 @@ class Matrix4Test {
                 12f, 8f, 2f, 9f
         )
 
-        Assert.assertEquals(Matrix4(
+        assertEquals(Matrix4(
                 11f, 18f, 6f, 15f,
                 26f, 12f, 14f, 25f,
                 10f, 6f, 26f, 14f,
@@ -91,7 +91,7 @@ class Matrix4Test {
                 12f, 8f, 2f, 9f
         )
 
-        Assert.assertEquals(Matrix4(
+        assertEquals(Matrix4(
                 -3f, -2f, 0f, -13f,
                 4f, 0f, 0f, -1f,
                 8f, -2f, -4f, 4f,
@@ -115,7 +115,7 @@ class Matrix4Test {
                 12f, 8f, 2f, 9f
         )
 
-        Assert.assertEquals(Matrix4(
+        assertEquals(Matrix4(
                 131f, 108f, 115f, 184f,
                 322f, 310f, 216f, 431f,
                 204f, 218f, 224f, 288f,
@@ -139,7 +139,7 @@ class Matrix4Test {
                 12f, 8f, 2f, 9f
         );
 
-        Assert.assertEquals(Matrix4(
+        assertEquals(Matrix4(
                 28f, 80f, 9f, 14f,
                 165f, 36f, 49f, 156f,
                 9f, 8f, 165f, 45f,
